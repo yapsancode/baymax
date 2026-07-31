@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baymax Guide System — How It Works</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f1117; color: #e2e8f0; font-size: 13px; }
+
+.root { padding: 20px; max-width: 900px; margin: 0 auto; }
+h1 { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.subtitle { font-size: 12px; color: #64748b; margin-bottom: 20px; }
+
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+.tab { padding: 6px 14px; border-radius: 6px; border: 1px solid #1e293b; background: #141922; color: #94a3b8; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.15s; }
+.tab.active { background: #1e40af; border-color: #3b82f6; color: #fff; }
+.tab:hover:not(.active) { border-color: #334155; color: #cbd5e1; }
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+.card { background: #141922; border: 1px solid #1e293b; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+.card-title { font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+
+.field { display: flex; gap: 10px; align-items: flex-start; padding: 5px 0; border-bottom: 1px solid #1e293b; }
+.field:last-child { border-bottom: none; }
+.field-key { min-width: 130px; font-weight: 600; color: #64748b; font-size: 11.5px; }
+.field-val { color: #e2e8f0; font-size: 12px; line-height: 1.5; }
+.field-val code { background: #0f1117; border: 1px solid #1e293b; border-radius: 4px; padding: 1px 5px; font-size: 11px; color: #7dd3fc; font-family: 'Courier New', monospace; }
+.tag { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-right: 4px; }
+.tag-click { background: #7c3aed22; color: #a78bfa; border: 1px solid #7c3aed44; }
+.tag-fill { background: #05966922; color: #6ee7b7; border: 1px solid #05966944; }
+.tag-highlight { background: #d9770622; color: #fbbf24; border: 1px solid #d9770644; }
+
+.flow { display: flex; flex-direction: column; gap: 0; }
+.flow-step { display: flex; gap: 12px; }
+.flow-line { display: flex; flex-direction: column; align-items: center; min-width: 28px; }
+.flow-dot { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+.dot-blue { background: #1e40af; color: #93c5fd; border: 2px solid #3b82f6; }
+.dot-green { background: #06406522; color: #6ee7b7; border: 2px solid #059669; }
+.dot-orange { background: #92400e22; color: #fbbf24; border: 2px solid #d97706; }
+.dot-purple { background: #4c1d9522; color: #c4b5fd; border: 2px solid #7c3aed; }
+.dot-red { background: #7f1d1d22; color: #fca5a5; border: 2px solid #dc2626; }
+.flow-connector { width: 2px; flex: 1; min-height: 10px; background: #1e293b; margin: 2px 0; }
+.flow-content { padding: 2px 0 14px; flex: 1; }
+.flow-title { font-weight: 600; color: #e2e8f0; font-size: 12.5px; margin-bottom: 3px; }
+.flow-desc { color: #64748b; font-size: 11.5px; line-height: 1.5; }
+.flow-desc code { background: #0f1117; border: 1px solid #1e293b; border-radius: 3px; padding: 0 4px; font-size: 10.5px; color: #7dd3fc; font-family: monospace; }
+
+.step-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.step-btn { padding: 8px 10px; border-radius: 8px; border: 1px solid #1e293b; background: #141922; color: #94a3b8; cursor: pointer; font-size: 11.5px; text-align: left; transition: all 0.15s; }
+.step-btn.active { border-color: #3b82f6; background: #1e3a5f; color: #93c5fd; }
+.step-btn .num { font-weight: 700; font-size: 10px; color: #475569; display: block; margin-bottom: 2px; }
+.step-btn.active .num { color: #3b82f6; }
+
+.layers { display: flex; flex-direction: column; gap: 6px; }
+.layer { border-radius: 8px; padding: 10px 13px; border-left: 3px solid; }
+.layer-json { background: #1e293b22; border-color: #334155; }
+.layer-panel { background: #1e3a5f22; border-color: #3b82f6; }
+.layer-bridge { background: #4c1d9522; border-color: #7c3aed; }
+.layer-page { background: #06406522; border-color: #059669; }
+.layer-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; color: #94a3b8; }
+.layer-body { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+.layer-body code { background: #0f1117; border-radius: 3px; padding: 0 4px; font-size: 11px; color: #7dd3fc; font-family: monospace; }
+.arrow { text-align: center; color: #334155; font-size: 16px; margin: 1px 0; }
+
+.anim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.anim-card { border-radius: 8px; padding: 12px; border: 1px solid #1e293b; background: #141922; }
+.anim-name { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 8px; }
+.anim-preview { background: #0f1117; border-radius: 6px; padding: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; min-height: 60px; }
+.anim-desc { font-size: 11.5px; color: #64748b; line-height: 1.4; }
+
+.pulse-box { width: 80px; height: 28px; background: transparent; border: 2px solid rgba(255,87,34,0.9); border-radius: 6px; animation: demoPulse 1.4s ease-in-out infinite; }
+@keyframes demoPulse {
+  0%,100% { box-shadow: 0 0 0 4px rgba(255,87,34,0.7), 0 0 18px 4px rgba(255,87,34,0.35); }
+  50% { box-shadow: 0 0 0 4px rgba(255,87,34,0.1), 0 0 4px 1px rgba(255,87,34,0.08); }
+}
+.bob-figure { font-size: 28px; animation: demoBob 2.6s ease-in-out infinite; display: inline-block; }
+@keyframes demoBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+.blink-eye { width: 12px; height: 12px; background: #1e293b; border-radius: 50%; animation: demoBlink 6s ease-in-out infinite; display: inline-block; margin: 0 4px; }
+.blink-face { background: white; border-radius: 20px; padding: 8px 18px; display: flex; align-items: center; }
+@keyframes demoBlink { 0%,90%,100%{transform:scaleY(1)} 95%{transform:scaleY(0.1)} }
+.wiggle-board { background: #fffbe9; color: #5b4a1f; border: 2px solid #e8d9a0; border-radius: 8px; padding: 5px 12px; font-size: 11px; font-weight: 700; animation: demoWiggle 3.2s ease-in-out infinite; display: inline-block; }
+@keyframes demoWiggle { 0%,100%{transform:rotate(-3deg)} 50%{transform:rotate(2deg)} }
+.glow-chip { width: 60px; height: 60px; background: linear-gradient(135deg,#1a2535,#0d1117); border: 1px solid #1a2535; border-radius: 8px; animation: demoGlow 4s ease-in-out infinite; }
+@keyframes demoGlow { 0%,100%{box-shadow:0 0 20px rgba(0,229,160,.1)} 50%{box-shadow:0 0 60px rgba(0,229,160,.25)} }
+
+.paths { display: flex; flex-direction: column; gap: 8px; }
+.path { background: #141922; border: 1px solid #1e293b; border-radius: 8px; padding: 10px 13px; display: flex; gap: 10px; align-items: flex-start; }
+.path-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.path-title { font-weight: 600; color: #e2e8f0; font-size: 12.5px; margin-bottom: 2px; }
+.path-desc { font-size: 11.5px; color: #64748b; line-height: 1.5; }
+.path-desc code { background: #0f1117; border-radius: 3px; padding: 0 4px; font-size: 10.5px; color: #7dd3fc; font-family: monospace; }
+.guard-note { background: #1e3a5f22; border: 1px solid #3b82f655; border-radius: 6px; padding: 8px 12px; margin-top: 8px; font-size: 11.5px; color: #93c5fd; }
+.note { font-size: 11px; color: #475569; padding: 7px 10px; background: #0f1117; border-radius: 6px; border: 1px solid #1e293b; margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="root">
+  <h1>Baymax Guide System — How It Works</h1>
+  <p class="subtitle">From JSON step definition → Chrome message → GCP page animation</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="show('overview', this)">Overview Flow</button>
+    <button class="tab" onclick="show('json', this)">JSON → Actions</button>
+    <button class="tab" onclick="show('steps', this)">Step by Step</button>
+    <button class="tab" onclick="show('completion', this)">Completion Paths</button>
+    <button class="tab" onclick="show('animations', this)">Animations</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div id="panel-overview" class="panel active">
+    <div class="card">
+      <div class="card-title">Full System Flow — What happens when a step becomes active</div>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-line"><div class="flow-dot dot-blue">1</div><div class="flow-connector"></div></div>
+          <div class="flow-content">
+            <div class="flow-title">JSON step loads in Guidance/index.jsx</div>
+            <div class="flow-desc"><code>STEPS[stepIndex]</code> gives the current step object — its <code>selector</code>, <code>urlPattern</code>, <code>advanceOnUrlPattern</code>, <code>action</code>, <code>url</code>. This is the source of truth for everything that follows.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-line"><div class="flow-dot dot-blue">2</div><div class="flow-connector"></div></div>
+          <div class="flow-content">
+            <div class="flow-title">URL check — "Are you on the right page?"</div>
+            <div class="flow-desc">
+              <code>getCurrentGcpUrl()</code> reads the active tab URL.<br>
+              → URL matches <code>advanceOnUrlPattern</code>? Step already done → skip forward.<br>
+              → URL fails <code>urlPattern</code>? Wrong page → show lost mascot + "Take me back".<br>
+              → URL ok? Continue to highlight.
+            </div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-line"><div class="flow-dot dot-purple">3</div><div class="flow-connector"></div></div>
+          <div class="flow-content">
+            <div class="flow-title">Chrome message sent to GCP tab</div>
+            <div class="flow-desc"><code>highlightStep(step)</code> calls <code>chrome.tabs.sendMessage()</code> to <b>every frame</b> in the tab (top + all iframes). Message contains: <code>action:"highlight"</code>, <code>selector</code>, <code>title</code>, <code>message</code>, <code>stepNumber</code>, <code>cheer</code>.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-line"><div class="flow-dot dot-green">4</div><div class="flow-connector"></div></div>
+          <div class="flow-content">
+            <div class="flow-title">Content script finds the element</div>
+            <div class="flow-desc"><code>findElement(selector)</code> splits by comma and tries each CSS selector with <code>document.querySelector()</code> left-to-right, stopping at first match. Special prefix <code>text:Cloud SQL</code> scans all links/buttons by visible text.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-line"><div class="flow-dot dot-green">5</div><div class="flow-connector"></div></div>
+          <div class="flow-content">
+            <div class="flow-title">Shadow DOM overlay injected</div>
+            <div class="flow-desc">A hidden host <code>&lt;div&gt;</code> with a <b>Shadow DOM</b> is appended to the GCP page body. Inside: a pulsing red border box over the element + the Baymax mascot beside it. GCP's CSS cannot leak in; our styles cannot leak out.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-line"><div class="flow-dot dot-orange">6</div><div class="flow-connector"></div></div>
+          <div class="flow-content">
+            <div class="flow-title">Event watchers attached</div>
+            <div class="flow-desc"><code>watchElement(el)</code> adds a capture-phase click listener on the element. If <code>action:"fill"</code>, <code>watchFill(el)</code> also listens for <code>input</code> events (debounced 1.1s). These send <code>BAYMAX_GUIDE_CLICKED</code> / <code>BAYMAX_GUIDE_FILLED</code> back to the panel.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-line"><div class="flow-dot dot-red">7</div><div class="flow-connector"></div></div>
+          <div class="flow-content">
+            <div class="flow-title">Step completes → auto-advance</div>
+            <div class="flow-desc">Any of three signals triggers <code>autoAdvance()</code>: user clicks element, user types in input, or tab URL matches <code>advanceOnUrlPattern</code>. An <code>advancedRef</code> guard ensures only the first signal advances — duplicates are dropped.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-line"><div class="flow-dot dot-blue">8</div><div class="flow-connector" style="background:transparent"></div></div>
+          <div class="flow-content">
+            <div class="flow-title">Overlay cleared, next step loads</div>
+            <div class="flow-desc"><code>clearOverlay()</code> removes the red box and mascot from the Shadow DOM. <code>stepIndex</code> increments, the effect re-runs from step 1 with the new step's JSON data.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JSON -->
+  <div id="panel-json" class="panel">
+    <div class="card">
+      <div class="card-title">What each JSON field controls</div>
+      <div class="field"><span class="field-key">title</span><span class="field-val">Shown in the side panel's <code>TaskStepCard</code> header AND in Baymax's speech bubble on the GCP page. Also read aloud by <code>speakText()</code> if voice is on.</span></div>
+      <div class="field"><span class="field-key">description</span><span class="field-val">The body text below the title — in the panel card, the mascot bubble, and the voice narration.</span></div>
+      <div class="field"><span class="field-key">action</span><span class="field-val">
+        <span class="tag tag-click">click</span> "Do it for me" calls <code>el.click()</code> after a 600ms highlight.<br>
+        <span class="tag tag-fill">fill</span> "Do it for me" uses the native <code>HTMLInputElement.prototype.value</code> setter then fires <code>input</code> + <code>change</code> events (React-compatible).<br>
+        <span class="tag tag-highlight">highlight</span> "Do it for me" is hidden — step only highlights the element.
+      </span></div>
+      <div class="field"><span class="field-key">selector</span><span class="field-val">Comma-separated CSS selectors tried left-to-right by <code>document.querySelector()</code>. First match wins. <code>text:Cloud SQL</code> is a special prefix that searches by visible text content instead.</span></div>
+      <div class="field"><span class="field-key">value</span><span class="field-val">Only for <code>action:"fill"</code> steps. The text programmatically typed into the input by "Do it for me".</span></div>
+      <div class="field"><span class="field-key">url</span><span class="field-val">The exact GCP URL this step lives on. Used by <code>goToStepPage()</code> when "Take me back" can't use browser history.</span></div>
+      <div class="field"><span class="field-key">urlPattern</span><span class="field-val">Regex tested against the current tab URL each time the step loads. Fails → show lost mascot. No <code>urlPattern</code> = any page is ok (Steps 1 &amp; 2).</span></div>
+      <div class="field"><span class="field-key">advanceOnUrlPattern</span><span class="field-val">Regex tested against the tab URL. Matches → step is DONE, auto-advance. Used to skip already-completed steps when the guide resumes, and to detect completion via navigation.</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Three layers a step passes through</div>
+      <div class="layers">
+        <div class="layer layer-json"><div class="layer-title">📄 Layer 1 — cloudSqlPostgres.js (JSON)</div><div class="layer-body">Declares <em>what</em> to do: selector, action, urlPattern, advanceOnUrlPattern. The only file you edit to fix or update the guide.</div></div>
+        <div class="arrow">↓</div>
+        <div class="layer layer-panel"><div class="layer-title">⚛️ Layer 2 — Guidance/index.jsx (React, side panel)</div><div class="layer-body">Reads the JSON. Checks URLs. Sends Chrome messages to the GCP tab. Listens for completion events. Manages <code>stepIndex</code> state and progress in <code>localStorage</code>.</div></div>
+        <div class="arrow">↓</div>
+        <div class="layer layer-bridge"><div class="layer-title">🔌 Layer 2.5 — guide.js (Chrome API bridge)</div><div class="layer-body">Wraps <code>chrome.tabs.sendMessage()</code>, <code>chrome.tabs.query()</code>, <code>chrome.tabs.onUpdated</code>. Broadcasts to all frames. Returns <code>{ok: true}</code> or <code>{error: '...'}</code>.</div></div>
+        <div class="arrow">↓</div>
+        <div class="layer layer-page"><div class="layer-title">🌐 Layer 3 — guide-overlay.js (content script, GCP page)</div><div class="layer-body">Receives the message. Runs <code>document.querySelector()</code>. Injects the Shadow DOM overlay. Draws the pulsing red box + Baymax mascot. Attaches click/input listeners. Sends completion events back.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEPS -->
+  <div id="panel-steps" class="panel">
+    <div class="step-grid" id="stepGrid"></div>
+    <div id="stepDetail" class="card"></div>
+  </div>
+
+  <!-- COMPLETION -->
+  <div id="panel-completion" class="panel">
+    <div class="card">
+      <div class="card-title">3 ways a step can complete (first one wins)</div>
+      <div class="paths">
+        <div class="path"><div class="path-icon">🖱️</div><div><div class="path-title">User clicks the highlighted element</div><div class="path-desc">Content script's <code>watchElement(el)</code> fires in capture phase → sends <code>BAYMAX_GUIDE_CLICKED</code> → panel's <code>onGuideStepEvent</code> checks selector match → <code>autoAdvance()</code>.</div></div></div>
+        <div class="path"><div class="path-icon">⌨️</div><div><div class="path-title">User types into a highlighted input</div><div class="path-desc"><code>watchFill(el)</code> listens for <code>input</code> events, debounced 1.1s → sends <code>BAYMAX_GUIDE_FILLED</code> → panel calls <code>autoAdvance()</code>. Only on <code>fill</code> steps.</div></div></div>
+        <div class="path"><div class="path-icon">🔗</div><div><div class="path-title">Tab URL changes to the step's destination</div><div class="path-desc"><code>chrome.tabs.onUpdated</code> fires on every navigation → <code>stepCompletedByUrl()</code> tests against <code>advanceOnUrlPattern</code> → <code>autoAdvance()</code>. Catches cases like clicking a search suggestion.</div></div></div>
+      </div>
+      <div class="guard-note">🛡️ <b>advancedRef guard:</b> all three paths call the same <code>autoAdvance()</code>. The ref is checked first — if already true, the call is dropped. Prevents double-advancing when a click and a URL change fire at the same time.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">"Do it for me" — automation path</div>
+      <div class="flow">
+        <div class="flow-step"><div class="flow-line"><div class="flow-dot dot-blue">1</div><div class="flow-connector"></div></div><div class="flow-content"><div class="flow-title">User clicks "Do it for me"</div><div class="flow-desc"><code>handleDoItForMe()</code> sets <code>automating=true</code>, calls <code>runStepAction(step)</code>.</div></div></div>
+        <div class="flow-step"><div class="flow-line"><div class="flow-dot dot-purple">2</div><div class="flow-connector"></div></div><div class="flow-content"><div class="flow-title">Chrome message sent: action "click" or "fill"</div><div class="flow-desc">Determined by <code>step.action</code>. Sent to all frames in the GCP tab.</div></div></div>
+        <div class="flow-step"><div class="flow-line"><div class="flow-dot dot-green">3</div><div class="flow-connector"></div></div><div class="flow-content"><div class="flow-title">Content script executes</div><div class="flow-desc"><b>click:</b> highlights 600ms → <code>el.click()</code>.<br><b>fill:</b> native setter → dispatch <code>input</code> + <code>change</code> events (React-compatible).</div></div></div>
+        <div class="flow-step"><div class="flow-line"><div class="flow-dot dot-orange">4</div><div class="flow-connector" style="background:transparent"></div></div><div class="flow-content"><div class="flow-title">Panel auto-advances after 800ms</div><div class="flow-desc"><code>setTimeout(autoAdvance, 800)</code> — gives GCP time to navigate before incrementing <code>stepIndex</code>.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANIMATIONS -->
+  <div id="panel-animations" class="panel">
+    <div class="card">
+      <div class="card-title">All animations in the system</div>
+      <div class="anim-grid">
+        <div class="anim-card">
+          <div class="anim-name">baymax-pulse — element highlight</div>
+          <div class="anim-preview"><div class="pulse-box"></div></div>
+          <div class="anim-desc">Red border box over the GCP button. <code>box-shadow</code> breathes in/out every <b>1.4s</b>. Injected into Shadow DOM. Positioned using <code>getBoundingClientRect()</code>.</div>
+        </div>
+        <div class="anim-card">
+          <div class="anim-name">baymax-bob — mascot figure</div>
+          <div class="anim-preview"><div class="bob-figure">🤖</div></div>
+          <div class="anim-desc">The Baymax SVG figure floats up and down <b>7px</b> every <b>2.6s</b>. Stops when mascot is <code>.baymax-offscreen</code> (element scrolled out of view).</div>
+        </div>
+        <div class="anim-card">
+          <div class="anim-name">bcBlink — chip eyes (Landing page)</div>
+          <div class="anim-preview"><div class="blink-face"><div class="blink-eye"></div><div class="blink-eye"></div></div></div>
+          <div class="anim-desc">Eyes stay open for <b>90%</b> of a 6s cycle, then <code>scaleY(0.1)</code> at 95% — a realistic blink. Defined in <code>BaymaxAnimated.jsx</code>.</div>
+        </div>
+        <div class="anim-card">
+          <div class="anim-name">baymax-wiggle — sign board</div>
+          <div class="anim-preview" style="padding:20px"><div class="wiggle-board">Step 3 of 9</div></div>
+          <div class="anim-desc">The "Step X of Y" board rocks <b>−3° to +2°</b> every <b>3.2s</b>. Applied to <code>.baymax-board</code> inside the Shadow DOM.</div>
+        </div>
+        <div class="anim-card">
+          <div class="anim-name">bcGlow — chip body (Landing page)</div>
+          <div class="anim-preview"><div class="glow-chip"></div></div>
+          <div class="anim-desc">The chip card's <code>box-shadow</code> pulses green every <b>4s</b>. Defined in <code>BaymaxAnimated.jsx</code> injected CSS.</div>
+        </div>
+        <div class="anim-card">
+          <div class="anim-name">SVG arm wave — pointing arm</div>
+          <div class="anim-preview" style="font-size:12px;color:#64748b;text-align:center">Arm rotates<br>−4° → −16° → −4°<br>every 1.6s</div>
+          <div class="anim-desc">Uses SVG <code>&lt;animateTransform&gt;</code> — not CSS. Mascot flips via <code>.baymax-flip</code> class so the arm always points at the target.</div>
+        </div>
+      </div>
+      <div class="note">All GCP page animations (pulse, bob, wiggle, pop, arm wave) live inside <code>guide-overlay.js</code> OVERLAY_CSS string and are scoped to the Shadow DOM — isolated from GCP's own styles.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const STEPS = [
+  { id:1, title:'Search for Cloud SQL', action:'fill', selector:'input[name="q"], input[aria-label*="Search" i][role="combobox"], ...', value:'"Cloud SQL"', urlPattern:'(none — works from any page)', advanceOnUrlPattern:'/sql/instances', url:'(none)', desc:'Fills the GCP top search bar with "Cloud SQL". No urlPattern so it works from any console page. advanceOnUrlPattern skips this step if already on /sql/instances.' },
+  { id:2, title:'Open SQL from results', action:'click', selector:'a[href*="/sql/instances"], [role="listbox"] a[href*="/sql"], ..., text:Cloud SQL', value:'(none)', urlPattern:'(none — works from any page)', advanceOnUrlPattern:'/sql/instances', url:'(none)', desc:'Clicks the Cloud SQL link in the search results. Handles the dropdown autocomplete and the full search results page via the text: fallback.' },
+  { id:3, title:'Create an instance', action:'click', selector:'[data-test-id="create-instance-button"], a[href*="/sql/choose-instance-engine"], ...', value:'(none)', urlPattern:'/sql/instances', advanceOnUrlPattern:'/sql/choose-instance-engine', url:'https://console.cloud.google.com/sql/instances', desc:'Highlights the "Create instance" button. urlPattern ensures user is on /sql/instances. Advances when URL reaches /sql/choose-instance-engine.' },
+  { id:4, title:'Choose PostgreSQL', action:'click', selector:'[data-test-id="engine-postgres"], button[aria-label*="PostgreSQL" i], ...', value:'(none)', urlPattern:'/sql/choose-instance-engine', advanceOnUrlPattern:'/sql/(postgres/)?create-instance', url:'https://console.cloud.google.com/sql/choose-instance-engine', desc:'Highlights the PostgreSQL engine option card. Advances when URL reaches the create-instance form.' },
+  { id:5, title:'Name your instance', action:'fill', selector:'input[name="instanceId"], input#instance-id, ...', value:'"baymax-postgres"', urlPattern:'/sql/(postgres/)?create-instance', advanceOnUrlPattern:'(none)', url:'https://console.cloud.google.com/sql/postgres/create-instance', desc:'Highlights the Instance ID input and fills it with "baymax-postgres" when "Do it for me" is used. Watches typing and reports BAYMAX_GUIDE_FILLED.' },
+  { id:6, title:'Set a password', action:'highlight', selector:'input[name="password"], input[type="password"], ...', value:'(none)', urlPattern:'/sql/(postgres/)?create-instance', advanceOnUrlPattern:'(none)', url:'https://console.cloud.google.com/sql/postgres/create-instance', desc:'action:"highlight" only — Baymax points at the password field but does NOT fill it for security. "Do it for me" button is hidden for this step.' },
+  { id:7, title:'Choose a region', action:'highlight', selector:'mat-select[name="region"], [data-test-id="region-select"], ...', value:'(none)', urlPattern:'/sql/(postgres/)?create-instance', advanceOnUrlPattern:'(none)', url:'https://console.cloud.google.com/sql/postgres/create-instance', desc:'Points at the region dropdown. Highlight-only, no automation. User must pick their own region.' },
+  { id:8, title:'Pick Sandbox edition', action:'click', selector:'[data-test-id="edition-sandbox"], button[aria-label*="Sandbox" i]', value:'(none)', urlPattern:'/sql/(postgres/)?create-instance', advanceOnUrlPattern:'(none)', url:'https://console.cloud.google.com/sql/postgres/create-instance', desc:'Highlights and can click the Sandbox edition button to keep costs low during development.' },
+  { id:9, title:'Create the instance', action:'click', selector:'[data-test-id="submit-button"], button[type="submit"]', value:'(none)', urlPattern:'/sql/(postgres/)?create-instance', advanceOnUrlPattern:'/sql/instances(?!.*create)', url:'https://console.cloud.google.com/sql/postgres/create-instance', desc:'Final step — submits the form. advanceOnUrlPattern uses a negative lookahead: /sql/instances NOT followed by "create", meaning the instances list page (provisioning started).' },
+]
+
+const actionColors = { fill:'tag-fill', click:'tag-click', highlight:'tag-highlight' }
+
+function show(id, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+  document.getElementById('panel-' + id).classList.add('active')
+  el.classList.add('active')
+}
+
+const grid = document.getElementById('stepGrid')
+const detail = document.getElementById('stepDetail')
+
+STEPS.forEach((s, i) => {
+  const btn = document.createElement('button')
+  btn.className = 'step-btn' + (i === 0 ? ' active' : '')
+  btn.innerHTML = `<span class="num">STEP ${s.id}</span>${s.title}`
+  btn.onclick = () => {
+    document.querySelectorAll('.step-btn').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    renderDetail(s)
+  }
+  grid.appendChild(btn)
+})
+
+function renderDetail(s) {
+  detail.innerHTML = `
+    <div class="card-title">Step ${s.id} — ${s.title}</div>
+    <div style="margin-bottom:10px;font-size:12px;color:#94a3b8;line-height:1.5">${s.desc}</div>
+    <div class="field"><span class="field-key">action</span><span class="field-val"><span class="tag ${actionColors[s.action]}">${s.action}</span>${s.action==='highlight'?'Baymax points but cannot automate. "Do it for me" is hidden.':s.action==='fill'?'Baymax fills the input using the native value setter.':'Baymax clicks the element after a 600ms highlight.'}</span></div>
+    <div class="field"><span class="field-key">selector</span><span class="field-val"><code>${s.selector}</code></span></div>
+    <div class="field"><span class="field-key">value</span><span class="field-val">${s.value}</span></div>
+    <div class="field"><span class="field-key">urlPattern</span><span class="field-val"><code>${s.urlPattern}</code><br><span style="font-size:11px;color:#475569">Fails → lost mascot shown.</span></span></div>
+    <div class="field"><span class="field-key">advanceOnUrlPattern</span><span class="field-val"><code>${s.advanceOnUrlPattern}</code><br><span style="font-size:11px;color:#475569">Matches → auto-advance to next step.</span></span></div>
+    <div class="field"><span class="field-key">url (Take me back)</span><span class="field-val"><code style="word-break:break-all">${s.url}</code></span></div>
+  `
+}
+renderDetail(STEPS[0])
+</script>
+</body>
+</html>

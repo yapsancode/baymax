@@ -1,0 +1,12 @@
+{
+  // The Python code lives in baymax-backend/ and uses bare imports
+  // (from config import settings, import db_call, from models import ...).
+  // Tell Pylance to treat baymax-backend/ as a source root so those resolve
+  // when this monorepo is opened at the root.
+  "python.analysis.extraPaths": ["./baymax-backend"],
+
+  // Each developer still selects their own interpreter once:
+  //   Ctrl+Shift+P -> "Python: Select Interpreter" -> baymax-backend/venv
+  // (the path differs per OS: venv/Scripts/python.exe on Windows,
+  //  venv/bin/python on macOS/Linux — so it isn't committed here).
+}

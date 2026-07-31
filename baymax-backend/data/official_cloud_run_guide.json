@@ -1,0 +1,144 @@
+{
+  "title": "Host a backend on Cloud Run",
+  "meta": {
+    "task": "backend",
+    "keywords": ["cloud run", "cloudrun"],
+    "prerequisites": [
+      {
+        "key": "projectSelected",
+        "label": "A GCP project is selected",
+        "hint": "Check the project picker in the console top bar."
+      },
+      {
+        "key": "billingEnabled",
+        "label": "Billing is enabled on the project",
+        "hint": "Cloud Run needs a billing account even for free-tier use."
+      },
+      {
+        "key": "consoleOpen",
+        "label": "The Cloud Console is open in this window",
+        "hint": "console.cloud.google.com — Baymax guides that tab."
+      },
+      {
+        "key": "languageEnglish",
+        "label": "Console language is English",
+        "hint": "Baymax finds buttons by their English names."
+      }
+    ],
+    "nextSteps": [
+      "This deployed Google's sample container — swap in your own image URL when you're ready.",
+      "A real backend needs its container port and env vars set (Edit & deploy new revision).",
+      "Check scaling: max instances caps your cost, min 0 means scale-to-zero.",
+      "Your service URL is public — restrict access if it shouldn't be."
+    ]
+  },
+  "steps": [
+    {
+      "id": 1,
+      "title": "Search for Cloud Run",
+      "description": "Click the search bar at the top of the console and type \"Cloud Run\". You can find any GCP product this way.",
+      "action": "fill",
+      "selector": "input.pcc-search-input, input[placeholder*=\"Search\" i], input[aria-label*=\"search for resources\" i]",
+      "revealSelector": "input.pcc-search-input, input[placeholder*=\"Search\" i], input[aria-label*=\"search for resources\" i], button[aria-label=\"Open search\" i]",
+      "value": "Cloud Run",
+      "fallbackUrl": "https://console.cloud.google.com/run",
+      "fallbackHint": "I can't find the search bar — the Console hides it behind a 🔍 icon when its window gets narrow. Drag my edge to give the Console more room and I'll spot it, or let me take you straight to Cloud Run.",
+      "advanceOnValueMatch": true,
+      "advanceOnUrlPattern": "/run(?:[/?;#]|$)"
+    },
+    {
+      "id": 2,
+      "title": "Open Cloud Run from the results",
+      "description": "Click the \"Cloud Run\" result (the Product) to open the Cloud Run page.",
+      "action": "click",
+      "name": "Cloud Run",
+      "exactName": true,
+      "href": "/run",
+      "avoidHref": "marketplace",
+      "requireSelector": true,
+      "selector": "a.pcc-search-result-primary-title, a[href*=\"/run?referrer=search\"]",
+      "revealSelector": "input.pcc-search-input, input[placeholder*=\"Search\" i], input[aria-label*=\"search for resources\" i], button[aria-label=\"Open search\" i]",
+      "revealValue": "Cloud Run",
+      "fallbackUrl": "https://console.cloud.google.com/run",
+      "fallbackHint": "I can't find the \"Cloud Run\" result — the suggestions list closes as soon as the Console loses focus, and a narrow window hides the search bar behind a 🔍 icon. Try the search again, or let me take you straight to Cloud Run.",
+      "advanceOnUrlPattern": "/run(?:[/?;#]|$)"
+    },
+    {
+      "id": 3,
+      "title": "Deploy a container",
+      "description": "You're in Cloud Run now. Click \"Deploy container\" to create a new service from a container image.",
+      "action": "click",
+      "name": "Deploy container",
+      "href": "/run/create",
+      "avoidText": "repositor,function",
+      "selector": "a[href*=\"deploymentType=container\"], a[href*=\"/run/create\"], button[aria-label*=\"Deploy container\" i]",
+      "url": "https://console.cloud.google.com/run/overview",
+      "urlPattern": "/run(?:/overview|/services)?(?:[?;#]|$)",
+      "advanceOnUrlPattern": "/run/create"
+    },
+    {
+      "id": 4,
+      "title": "Use the sample container",
+      "description": "Click \"Test with a sample container\" — it fills in Google's demo image so you can try the flow. (Deploying your own app instead? Paste your image URL into the Container image URL field.)",
+      "action": "click",
+      "name": "Test with a sample container",
+      "url": "https://console.cloud.google.com/run/create",
+      "urlPattern": "/run/create"
+    },
+    {
+      "id": 5,
+      "title": "Name your service",
+      "description": "The service name auto-filled as \"hello\" from the sample image. Keep it, or type a name you like — this becomes part of your service URL and can't be changed later.",
+      "action": "highlight",
+      "name": "Service name",
+      "url": "https://console.cloud.google.com/run/create",
+      "urlPattern": "/run/create"
+    },
+    {
+      "id": 6,
+      "title": "Choose a region",
+      "description": "Pick where your service runs. The default works fine — asia-southeast1 (Singapore) is closest if you're in Southeast Asia. This also can't be changed later.",
+      "action": "highlight",
+      "role": "combobox",
+      "name": "Region",
+      "selector": "cfc-select",
+      "url": "https://console.cloud.google.com/run/create",
+      "urlPattern": "/run/create"
+    },
+    {
+      "id": 7,
+      "title": "Allow public access",
+      "description": "Under Authentication, choose \"Allow public access\" so your service gets a URL anyone can open in a browser. (For internal APIs you'd require authentication instead.)",
+      "action": "click",
+      "name": "Allow public access",
+      "role": "radio",
+      "avoidText": "require",
+      "selector": "mat-radio-button, [role=\"radio\"], input[type=\"radio\"]",
+      "url": "https://console.cloud.google.com/run/create",
+      "urlPattern": "/run/create"
+    },
+    {
+      "id": 8,
+      "title": "Create the service",
+      "description": "Click \"Create\" to deploy. If a red error points at the Security section, open it and set Service account to \"Default compute service account\", then click Create again.",
+      "action": "click",
+      "name": "Create",
+      "requireSelector": true,
+      "selector": "button[type=\"submit\"], [data-test-id=\"submit-button\"]",
+      "url": "https://console.cloud.google.com/run/create",
+      "urlPattern": "/run/create",
+      "advanceOnUrlPattern": "/run/detail",
+      "awaitNavigation": true
+    },
+    {
+      "id": 9,
+      "title": "Watch it go live",
+      "description": "Cloud Run is provisioning your service — wait for the green check next to the service name (under a minute). Then click the URL to see your app live!",
+      "action": "highlight",
+      "requireSelector": true,
+      "selector": "a[href*=\".run.app\"]",
+      "url": "https://console.cloud.google.com/run",
+      "urlPattern": "/run/detail"
+    }
+  ]
+}

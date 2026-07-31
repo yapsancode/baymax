@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "Baymax",
+  "version": "1.0.0",
+  "description": "AI-powered GCP setup guide",
+  "permissions": ["sidePanel", "storage", "unlimitedStorage", "tabs", "scripting", "webNavigation", "activeTab"],
+  "host_permissions": ["https://console.cloud.google.com/*", "<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["https://console.cloud.google.com/*"],
+      "js": ["voice-listener.js"]
+    },
+    {
+      "matches": ["https://console.cloud.google.com/*"],
+      "js": ["guide-overlay.js"],
+      "all_frames": true
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "side_panel": {
+    "default_path": "index.html"
+  },
+  "action": {
+    "default_title": "Open Baymax"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["dashboard.html"],
+      "matches": ["<all_urls>"]
+    },
+    {
+      "resources": ["assets/*.js"],
+      "matches": ["https://console.cloud.google.com/*"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}

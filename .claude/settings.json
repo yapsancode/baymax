@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import json; json.load\\(open\\('dist/manifest.json'\\)\\)\")",
+      "Bash(python -c \"import json; json.load\\(open\\('manifest.json'\\)\\)\")",
+      "Bash(python -c \"import json; json.load\\(open\\('data/official_cloud_run_guide.json'\\)\\)\")",
+      "Bash(openssl version *)",
+      "Bash(mkdir -p /c/Users/ACER/AppData/Local/Temp/claude/c--Users-ACER-Desktop-gamuda-learning-capstone-g5-c6/37f8e62e-3d26-4cac-ad02-05cd34e9c398/scratchpad)",
+      "Bash(openssl genrsa *)",
+      "Bash(openssl rsa *)",
+      "Bash(openssl base64 *)",
+      "Bash(python3 - /c/Users/ACER/AppData/Local/Temp/claude/c--Users-ACER-Desktop-gamuda-learning-capstone-g5-c6/37f8e62e-3d26-4cac-ad02-05cd34e9c398/scratchpad/baymax-extension-key-public.der)",
+      "Bash(python - /c/Users/ACER/AppData/Local/Temp/claude/c--Users-ACER-Desktop-gamuda-learning-capstone-g5-c6/37f8e62e-3d26-4cac-ad02-05cd34e9c398/scratchpad/baymax-extension-key-public.der)",
+      "Bash(python -c \"import json; json.load\\(open\\('manifest.json'\\)\\); print\\('valid JSON'\\)\")",
+      "Bash(python -c \"import json; json.load\\(open\\('manifest.json'\\)\\); print\\('manifest.json valid'\\)\")",
+      "Bash(git rev-parse *)",
+      "Bash(git fetch *)",
+      "Bash(npm run *)",
+      "Bash(curl -s -m 3 http://127.0.0.1:8000/guides -o /dev/null -w \"http_status:%{http_code}\\\\n\")",
+      "Bash(python -c \"print\\('py ok'\\)\")",
+      "Bash(python -c ' *)",
+      "Bash(pip show *)",
+      "Bash(pip --version)",
+      "Bash(/c/Users/ACER/anaconda3/envs/paas_server/python.exe -c 'import pydantic_settings; print\\('\\\\''ok'\\\\''\\)')",
+      "Bash(/c/Users/ACER/anaconda3/envs/paas_server/python.exe -c ' *)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(Get-Content data/seed_official_guide.py)",
+      "Bash(python -c \"print\\(open\\('data/seed_official_guide.py'\\).read\\(\\)[:2000]\\)\")",
+      "Bash(\"/c/Users/ACER/anaconda3/envs/paas_server/python.exe\" -c \"print\\(open\\('data/seed_official_guide.py'\\).read\\(\\)[:2500]\\)\")",
+      "Bash(\"/c/Users/ACER/anaconda3/envs/paas_server/python.exe\" data/seed_official_guide.py data/official_cloud_run_guide.json --email reaganhoo@gmail.com)",
+      "Bash(\"/c/Users/ACER/anaconda3/envs/paas_server/python.exe\" data/seed_official_guide.py data/official_cloud_sql_guide.json --email reaganhoo@gmail.com)",
+      "Bash(echo \"exit:$?\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('services/chat_service.py'\\).read\\(\\)\\); ast.parse\\(open\\('routers/chat.py'\\).read\\(\\)\\); ast.parse\\(open\\('schemas/chat.py'\\).read\\(\\)\\); print\\('ok'\\)\")",
+      "Bash(python -m pytest tests/ -q)"
+    ]
+  }
+}

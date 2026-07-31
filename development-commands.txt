@@ -1,0 +1,31 @@
+# backend
+cd baymax-backend
+
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate        # macOS/Linux
+# source venv/Scripts/activate  # Windows bash
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run dev server
+uvicorn main:app --reload
+
+# Run tests
+pytest tests/
+
+# frontend
+cd baymax-extension
+
+# to Run
+npm run dev
+
+# to deploy on browser
+npm run build
+open browser
+-> chrome extension (click manage extension)
+-> enable developer mode
+-> load unpacked
+-> select baymax frontend
+-> dist folder

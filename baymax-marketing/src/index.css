@@ -1,0 +1,407 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+@import '@fontsource-variable/inter';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import '@fontsource-variable/geist';
+
+/*
+  Dark mode is class-based: `.dark` on <html> flips all tokens below.
+  The toggle lives on the dashboard Profile page; see src/lib/theme.js.
+*/
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   NON-COLOR DESIGN TOKENS
+   Font and type scale only. Color tokens live in :root / .dark — one source
+   of truth. Don't add color values here; add them to :root and .dark instead.
+───────────────────────────────────────────────────────────────────────────── */
+@theme {
+  /* Font */
+  --font-sans: 'Inter Variable', system-ui, sans-serif;
+
+  /*
+    Type scale — semantic.
+    Use text-display / text-h1 / text-body etc. instead of text-xs/sm/base/lg
+    so headings stay uniform across screens and are easy to change globally.
+  */
+  --text-display: 1.5rem;
+  --text-display--line-height: 1.25;
+  --text-display--font-weight: 600;
+
+  --text-h1: 1.125rem;
+  --text-h1--line-height: 1.4;
+  --text-h1--font-weight: 600;
+
+  --text-h2: 0.9375rem;
+  --text-h2--line-height: 1.4;
+  --text-h2--font-weight: 600;
+
+  --text-body: 0.875rem;
+  --text-body--line-height: 1.5;
+  --text-body--font-weight: 400;
+
+  --text-small: 0.8125rem;
+  --text-small--line-height: 1.45;
+  --text-small--font-weight: 400;
+
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.4;
+  --text-caption--font-weight: 500;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TAILWIND UTILITY → CSS VARIABLE BRIDGE
+   Maps bg-*, text-*, border-* etc. utilities to the CSS variables in :root/.dark.
+   When you add a new token to :root, add a matching line here so Tailwind
+   generates the utility class for it (e.g. bg-success, text-success-foreground).
+───────────────────────────────────────────────────────────────────────────── */
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: 'Geist Variable', sans-serif;
+
+  /* Surfaces */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Brand */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+
+  /* Status — each has a -soft for badge/chip backgrounds */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-soft: var(--info-soft);
+
+  /* Categorical (task identity, not status) — see components/shared/TaskIcon */
+  --color-purple: var(--purple);
+  --color-purple-soft: var(--purple-soft);
+
+  /* Charts */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Sidebar */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Radius */
+  --radius-sm: calc(var(--radius) * 0.75);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) * 1.5);
+  --radius-xl: calc(var(--radius) * 2);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   LIGHT MODE — single source of truth for all color values.
+   These are the project's brand colors. Every Tailwind utility reads from here
+   via the @theme inline bridge above. To add a new color: add it here, add the
+   dark override in .dark, and add the @theme inline mapping above.
+───────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Surfaces */
+  --background: hsl(0 0% 100%);
+  --foreground: hsl(240 10% 4%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(240 10% 4%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(240 10% 4%);
+  --muted: hsl(240 5% 96%);
+  --muted-foreground: hsl(240 4% 46%);
+  --border: hsl(240 6% 90%);
+  --input: hsl(240 6% 90%);
+
+  /* Brand */
+  --primary: hsl(178 64% 30%);
+  --primary-foreground: hsl(0 0% 98%);
+  --secondary: hsl(240 5% 96%);
+  --secondary-foreground: hsl(240 10% 4%);
+  --accent: hsl(178 64% 92%);
+  --accent-foreground: hsl(178 64% 20%);
+  --ring: hsl(178 64% 38%);
+  --destructive: hsl(0 72% 51%);
+
+  /* Status */
+  --success: hsl(158 64% 34%);
+  --success-foreground: hsl(158 64% 20%);
+  --success-soft: hsl(158 64% 92%);
+  --warning: hsl(35 92% 50%);
+  --warning-foreground: hsl(28 80% 28%);
+  --warning-soft: hsl(40 100% 95%);
+  --danger: hsl(0 72% 51%);
+  --danger-foreground: hsl(0 70% 35%);
+  --danger-soft: hsl(0 86% 97%);
+  --info: hsl(217 91% 60%);
+  --info-foreground: hsl(217 80% 32%);
+  --info-soft: hsl(217 100% 96%);
+
+  /* Categorical */
+  --purple: hsl(271 91% 65%);
+  --purple-soft: hsl(270 100% 98%);
+
+  /* Charts */
+  --chart-1: hsl(178 64% 34%);
+  --chart-2: hsl(217 91% 60%);
+  --chart-3: hsl(271 91% 65%);
+  --chart-4: hsl(35 92% 50%);
+  --chart-5: hsl(0 72% 51%);
+
+  /* Sidebar */
+  --sidebar: hsl(0 0% 98%);
+  --sidebar-foreground: hsl(240 10% 4%);
+  --sidebar-primary: #00403e;
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(178 64% 92%);
+  --sidebar-accent-foreground: hsl(178 64% 20%);
+  --sidebar-border: hsl(240 6% 90%);
+  --sidebar-ring: hsl(178 64% 38%);
+
+  /* Radius */
+  --radius: 0.5rem;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DARK MODE — overrides for every token in :root above.
+   Only colors flip; type scale and radius are shared. Add both a :root value
+   and a .dark override whenever you introduce a new color token.
+───────────────────────────────────────────────────────────────────────────── */
+.dark {
+  /* Surfaces */
+  --background: hsl(240 10% 12%);
+  --foreground: hsl(0 0% 95%);
+  --card: hsl(240 10% 16%);
+  --card-foreground: hsl(0 0% 95%);
+  --popover: hsl(240 10% 16%);
+  --popover-foreground: hsl(0 0% 95%);
+  --muted: hsl(240 8% 7%);
+  --muted-foreground: hsl(240 5% 64%);
+  --border: hsl(240 5% 22%);
+  --input: hsl(240 5% 22%);
+
+  /* Brand */
+  --primary: hsl(178 64% 30%);
+  --primary-foreground: hsl(0 0% 98%);
+  --secondary: hsl(240 8% 18%);
+  --secondary-foreground: hsl(0 0% 95%);
+  --accent: hsl(178 42% 16%);
+  --accent-foreground: hsl(178 50% 72%);
+  --ring: hsl(178 64% 38%);
+  --destructive: hsl(0 78% 62%);
+
+  /* Status */
+  --success: hsl(158 64% 40%);
+  --success-foreground: hsl(158 52% 72%);
+  --success-soft: hsl(158 38% 14%);
+  --warning: hsl(35 92% 55%);
+  --warning-foreground: hsl(40 90% 72%);
+  --warning-soft: hsl(35 45% 15%);
+  --danger: hsl(0 78% 62%);
+  --danger-foreground: hsl(0 85% 78%);
+  --danger-soft: hsl(0 45% 17%);
+  --info: hsl(217 91% 64%);
+  --info-foreground: hsl(217 88% 80%);
+  --info-soft: hsl(217 45% 19%);
+
+  /* Categorical */
+  --purple: hsl(271 91% 76%);
+  --purple-soft: hsl(271 39% 20%);
+
+  /* Charts */
+  --chart-1: hsl(178 64% 40%);
+  --chart-2: hsl(217 91% 64%);
+  --chart-3: hsl(271 91% 76%);
+  --chart-4: hsl(35 92% 55%);
+  --chart-5: hsl(0 78% 62%);
+
+  /* Sidebar */
+  --sidebar: hsl(240 10% 10%);
+  --sidebar-foreground: hsl(0 0% 95%);
+  --sidebar-primary: hsl(178 64% 38%);
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(178 42% 16%);
+  --sidebar-accent-foreground: hsl(178 50% 72%);
+  --sidebar-border: hsl(240 5% 22%);
+  --sidebar-ring: hsl(178 64% 38%);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   LANDING PAGE THEME
+   Always-dark marketing surface scoped under .landing on the Landing root.
+   Remaps the shared tokens for that subtree only — the app's light/dark toggle
+   is completely unaffected. Components like <Button> and <BaymaxLogo> render
+   correctly inside it because they read the same token names.
+───────────────────────────────────────────────────────────────────────────── */
+.landing {
+  --background: hsl(180 24% 5%);
+  --foreground: hsl(168 18% 96%);
+  --card: hsl(180 14% 9%);
+  --card-foreground: hsl(168 18% 96%);
+  --muted: hsl(180 12% 13%);
+  --muted-foreground: hsl(174 9% 68%);
+  --border: hsl(180 10% 18%);
+  --primary: hsl(172 70% 45%);
+  --primary-foreground: hsl(174 80% 8%);
+  --accent: hsl(174 38% 14%);
+  --accent-foreground: hsl(172 60% 70%);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   THIRD-PARTY UI MOCKS — pitch deck only (src/pages/Landing).
+   Always-light token scopes that imitate the real products instead of our
+   brand: .mock-gcp = the Google Cloud Console, .mock-claude = claude.ai.
+   Same mechanism as .landing — put the class on the mock's root and every
+   token utility inside flips. Never used by the app itself.
+───────────────────────────────────────────────────────────────────────────── */
+.mock-gcp {
+  --background: #ffffff;
+  --foreground: #202124;
+  --card: #ffffff;
+  --muted: #f1f3f4;
+  --muted-foreground: #5f6368;
+  --border: #dadce0;
+  --primary: #1a73e8;
+  --primary-foreground: #ffffff;
+  --accent: #e8f0fe;
+  --accent-foreground: #1a73e8;
+}
+.mock-claude {
+  --background: #ffffff;
+  --foreground: #1f1e1d;
+  --card: #ffffff;
+  --muted: #f5f4ef;
+  --muted-foreground: #73726c;
+  --border: #e8e6dc;
+  --primary: #d97757;
+  --primary-foreground: #ffffff;
+  --accent: #f5f4ef;
+  --accent-foreground: #c15f3c;
+}
+
+/* Dark extension panel used by the merged window in the ambient-context slide.
+   Mirrors the Gemini-style dark workspace inside the landing dark theme. */
+.mock-gemini,
+.mock-extension {
+  --background: hsl(180 24% 5%);
+  --foreground: hsl(168 18% 96%);
+  --card: hsl(180 14% 9%);
+  --muted: hsl(180 12% 13%);
+  --muted-foreground: hsl(174 9% 68%);
+  --border: hsl(180 10% 18%);
+  --primary: hsl(172 70% 45%);
+  --primary-foreground: hsl(174 80% 8%);
+  --accent: hsl(174 38% 14%);
+  --accent-foreground: hsl(172 60% 70%);
+}
+.mic-active {
+  background-color: #e14942;
+  /* color: var(--color-danger-foreground); */
+}
+/* .animated-waveBar {
+  height: 3px;
+  animation: waveBar 0.7s ease-in-out infinite;
+       
+} */
+@keyframes waveBar {
+  0%,
+  100% {
+    height: 3px;
+  }
+  50% {
+    height: 22px;
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes typingBounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0;
+}
+.typing-indicator span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.4;
+  animation: typingBounce 1.4s ease-in-out infinite;
+}
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  /* Prevent the document root from creating a second scroll container.
+     All scrolling happens inside the app's own scroll regions
+     (e.g. the .landing div, the dashboard panels). */
+  html,
+  body {
+    overflow: hidden;
+    height: 100%;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+  html {
+    @apply font-sans;
+    @apply bg-background text-foreground;
+  }
+}

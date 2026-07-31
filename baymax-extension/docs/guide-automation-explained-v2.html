@@ -1,0 +1,2209 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Baymax — How the Guide Automation &amp; Navigation Work (v2)</title>
+    <style>
+      :root {
+        --bg: #f7f8fa;
+        --panel: #ffffff;
+        --ink: #1c2230;
+        --muted: #5b6472;
+        --line: #e4e8ee;
+        --accent: #ff5722;
+        --accent2: #0b6bcb;
+        --code-bg: #0f1626;
+        --code-ink: #e6edf3;
+        --data: #7c3aed;
+        --react: #0b6bcb;
+        --bridge: #0e8f6f;
+        --content: #c2410c;
+        --shadow: 0 2px 10px rgba(20, 30, 60, 0.06);
+        --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          15px/1.62 -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          Arial,
+          sans-serif;
+      }
+      .wrap {
+        display: grid;
+        grid-template-columns: 270px 1fr;
+        max-width: 1280px;
+        margin: 0 auto;
+      }
+      /* Sidebar */
+      aside {
+        position: sticky;
+        top: 0;
+        align-self: start;
+        height: 100vh;
+        overflow: auto;
+        padding: 22px 16px;
+        border-right: 1px solid var(--line);
+        background: var(--panel);
+      }
+      aside h2 {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        margin: 18px 0 8px;
+      }
+      aside a {
+        display: block;
+        color: var(--ink);
+        text-decoration: none;
+        padding: 5px 9px;
+        border-radius: 7px;
+        font-size: 13.5px;
+      }
+      aside a:hover {
+        background: #eef2f7;
+      }
+      aside a.file {
+        font-weight: 600;
+      }
+      aside .brand {
+        font-weight: 800;
+        font-size: 17px;
+        letter-spacing: -0.01em;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+      }
+      aside .brand .dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+      aside .sub {
+        color: var(--muted);
+        font-size: 12px;
+        margin-bottom: 6px;
+      }
+      /* Main */
+      main {
+        padding: 34px 46px 120px;
+        min-width: 0;
+      }
+      h1 {
+        font-size: 30px;
+        letter-spacing: -0.02em;
+        margin: 0 0 6px;
+      }
+      .lede {
+        color: var(--muted);
+        font-size: 16px;
+        max-width: 70ch;
+        margin: 0 0 26px;
+      }
+      h2.sec {
+        font-size: 23px;
+        margin: 46px 0 6px;
+        padding-top: 14px;
+        letter-spacing: -0.01em;
+        border-top: 2px solid var(--line);
+      }
+      h3 {
+        font-size: 18px;
+        margin: 30px 0 6px;
+      }
+      h4 {
+        font-size: 15px;
+        margin: 22px 0 4px;
+        color: var(--accent2);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-weight: 700;
+      }
+      p {
+        margin: 9px 0;
+        max-width: 74ch;
+      }
+      code {
+        font-family: var(--mono);
+        font-size: 0.9em;
+        background: #eef1f6;
+        padding: 1.5px 5px;
+        border-radius: 5px;
+        color: #33405a;
+      }
+      pre {
+        background: var(--code-bg);
+        color: var(--code-ink);
+        border-radius: 11px;
+        padding: 16px 18px;
+        overflow: auto;
+        font-family: var(--mono);
+        font-size: 12.9px;
+        line-height: 1.6;
+        margin: 14px 0;
+        box-shadow: var(--shadow);
+      }
+      pre code {
+        background: none;
+        padding: 0;
+        color: inherit;
+        font-size: inherit;
+      }
+      .cmt {
+        color: #8b97ad;
+      }
+      .kw {
+        color: #ff9d6b;
+      }
+      .str {
+        color: #9fe6a0;
+      }
+      .fn {
+        color: #7cc7ff;
+      }
+      .num {
+        color: #e6c07b;
+      }
+      /* Pills / tags */
+      .pill {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 9px;
+        border-radius: 999px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        vertical-align: middle;
+      }
+      .p-data {
+        background: #f0e7ff;
+        color: var(--data);
+      }
+      .p-react {
+        background: #e3effc;
+        color: var(--react);
+      }
+      .p-bridge {
+        background: #dcf4ec;
+        color: var(--bridge);
+      }
+      .p-content {
+        background: #fdeadd;
+        color: var(--content);
+      }
+      .p-new {
+        background: #fde8f0;
+        color: #be185d;
+      }
+      /* Callouts */
+      .note,
+      .warn,
+      .key,
+      .changed {
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin: 16px 0;
+        font-size: 14px;
+        border: 1px solid;
+      }
+      .note {
+        background: #f0f6ff;
+        border-color: #cfe2fb;
+      }
+      .warn {
+        background: #fff6ed;
+        border-color: #ffd8b5;
+      }
+      .key {
+        background: #f3fbf7;
+        border-color: #c5ebd9;
+      }
+      .changed {
+        background: #fdf2f8;
+        border-color: #f5c7dd;
+      }
+      .note b,
+      .warn b,
+      .key b,
+      .changed b {
+        color: var(--ink);
+      }
+      /* Tables */
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 16px 0;
+        font-size: 13.4px;
+        box-shadow: var(--shadow);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 9px 12px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+      th {
+        background: #eef2f7;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      td code {
+        white-space: nowrap;
+      }
+      /* Flow diagram */
+      .diagram {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 22px;
+        margin: 20px 0;
+        box-shadow: var(--shadow);
+        overflow: auto;
+      }
+      .ctx {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+      .ctx .box {
+        border: 2px solid;
+        border-radius: 12px;
+        padding: 14px;
+        background: #fbfcfe;
+      }
+      .ctx .box.b1 {
+        border-color: var(--react);
+      }
+      .ctx .box.b2 {
+        border-color: #94a3b8;
+      }
+      .ctx .box.b3 {
+        border-color: var(--content);
+      }
+      .ctx .box h5 {
+        margin: 0 0 6px;
+        font-size: 13px;
+      }
+      .ctx .box small {
+        color: var(--muted);
+        font-size: 12px;
+        display: block;
+      }
+      .ctx .box ul {
+        margin: 8px 0 0;
+        padding-left: 18px;
+        font-size: 12.5px;
+        color: #3a4557;
+      }
+      .arrowrow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 12.5px;
+        margin: 14px 0;
+        flex-wrap: wrap;
+      }
+      .chip {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        background: #eef1f6;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 2px 7px;
+      }
+      .step-chain {
+        counter-reset: s;
+        margin: 16px 0;
+        padding: 0;
+        list-style: none;
+      }
+      .step-chain li {
+        position: relative;
+        padding: 10px 0 10px 44px;
+        border-left: 2px dashed var(--line);
+        margin-left: 14px;
+      }
+      .step-chain li::before {
+        counter-increment: s;
+        content: counter(s);
+        position: absolute;
+        left: -15px;
+        top: 8px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #fff;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+      }
+      .step-chain li b {
+        color: var(--ink);
+      }
+      .anno {
+        margin: 14px 0;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .anno .ln {
+        display: grid;
+        grid-template-columns: 56px 1fr;
+        border-bottom: 1px solid var(--line);
+      }
+      .anno .ln:last-child {
+        border-bottom: none;
+      }
+      .anno .n {
+        background: #f5f7fb;
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 12px;
+        padding: 8px 10px;
+        text-align: right;
+      }
+      .anno .d {
+        padding: 8px 12px;
+        font-size: 13.6px;
+      }
+      .anno .d code {
+        font-size: 12.5px;
+      }
+      .filehdr {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .filehdr .path {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .legend {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin: 10px 0 0;
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+      .legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .legend i {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+        display: inline-block;
+      }
+      hr {
+        border: none;
+        border-top: 1px solid var(--line);
+        margin: 34px 0;
+      }
+      .toc-top {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin: 22px 0;
+        box-shadow: var(--shadow);
+      }
+      .toc-top ol {
+        margin: 6px 0 0;
+        padding-left: 20px;
+      }
+      .toc-top a {
+        color: var(--accent2);
+        text-decoration: none;
+      }
+      .toc-top a:hover {
+        text-decoration: underline;
+      }
+      a.src {
+        color: var(--accent2);
+        text-decoration: none;
+        border-bottom: 1px dotted var(--accent2);
+      }
+      .mini {
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <aside>
+        <div class="brand"><span class="dot"></span>Baymax Guide Engine</div>
+        <div class="sub">How automation &amp; navigation work — v2</div>
+
+        <h2>Orientation</h2>
+        <a href="#changelog">What changed in v2</a>
+        <a href="#overview">Big picture</a>
+        <a href="#contexts">The 3 contexts</a>
+        <a href="#protocol">Message protocol</a>
+
+        <h2>File by file</h2>
+        <a class="file" href="#data"><span class="pill p-data">data</span> guides/ (2 files)</a>
+        <a class="file" href="#react"><span class="pill p-react">ui</span> Guidance/index.jsx</a>
+        <a class="file" href="#bridge"><span class="pill p-bridge">bridge</span> guide.js</a>
+        <a class="file" href="#content"
+          ><span class="pill p-content">page</span> guide-overlay.js</a
+        >
+
+        <h2>How it flows</h2>
+        <a href="#flow-open">Opening a step</a>
+        <a href="#flow-advance">Advancing / auto-skip</a>
+        <a href="#flow-offtrack">Off-track &amp; "Take me back"</a>
+        <a href="#flow-doitforme">"Do it for me"</a>
+        <a href="#flow-reposition">Self-healing highlight</a>
+        <a href="#flow-record">Recording a guide</a>
+        <a href="#patterns">Design patterns recap</a>
+      </aside>
+
+      <main>
+        <h1>
+          How the Baymax guide automation &amp; navigation work <span class="pill p-new">v2</span>
+        </h1>
+        <p class="lede">
+          A walkthrough of the four layers that turn a static list of steps into a live,
+          self-correcting overlay on the Google Cloud Console — regenerated 2026-07-09 to match the
+          current code (post "single progress source" / "pinned tab" / official Cloud Run guide
+          changes).
+        </p>
+
+        <!-- ============================================================ -->
+        <h2 class="sec" id="changelog">0 &nbsp;What changed since v1 of this doc</h2>
+        <p>If you read the old doc, these are the parts of the system that have since changed:</p>
+        <table>
+          <tr>
+            <th>Area</th>
+            <th>v1 said</th>
+            <th>The code now</th>
+          </tr>
+          <tr>
+            <td><b>Progress store</b></td>
+            <td>
+              <code>stepIndex</code> resumes from <b>localStorage</b> (<code>loadProgress</code>)
+            </td>
+            <td>
+              localStorage progress is <b>gone</b>. The backend step <code>status</code> is the ONE
+              source of truth (<code>markStepStatus</code> writes it; resume =
+              <code>listSteps</code> → first step not <code>completed/skipped</code>). A fresh run
+              always starts at step&nbsp;0.
+            </td>
+          </tr>
+          <tr>
+            <td><b>Which tab is guided</b></td>
+            <td>Every command re-queries the <b>active</b> tab</td>
+            <td>
+              The run is <b>pinned to one Console tab</b> (<code>guidedTabId</code>). Highlights,
+              URL events, off-track checks and auto-advance all follow that tab even when another
+              GCP tab gains focus. <code>resetGuidedTab()</code> drops the pin on a fresh Guidance
+              mount / recording start.
+            </td>
+          </tr>
+          <tr>
+            <td><b>Guides</b></td>
+            <td>One hardcoded guide (<code>cloudSqlPostgres.js</code>)</td>
+            <td>
+              Two bundled guides — <code>cloudSqlPostgres.js</code> (default/mock) and
+              <code>cloudRun.js</code> (an <b>offline copy</b>; the live official guide is fetched
+              from the backend <code>recorded_guides</code> where <code>is_official</code>). Guides
+              can now declare <code>prerequisites</code> (PrereqGate screen) and
+              <code>nextSteps</code> (completion screen).
+            </td>
+          </tr>
+          <tr>
+            <td><b>Step fields</b></td>
+            <td>—</td>
+            <td>
+              New <code>revealSelector</code> / <code>revealValue</code>: re-summon a transient
+              panel (the search-suggestions dropdown) before resolving, since it closes when the
+              side panel takes focus.
+            </td>
+          </tr>
+          <tr>
+            <td><b>Step loading</b></td>
+            <td>Backend session ⇒ fetch steps from backend</td>
+            <td>
+              <b>Local steps are authoritative</b> even when a <code>sessionId</code> exists — the
+              backend copy is lossy (<code>schemas/step.py</code> drops resolver fields like
+              <code>name</code>, <code>exactName</code>, <code>avoidText</code>,
+              <code>awaitNavigation</code>). Backend fetch happens only when resuming with no local
+              copy.
+            </td>
+          </tr>
+          <tr>
+            <td><b>"Take me back"</b></td>
+            <td><code>goBack</code>, else navigate to <code>step.url</code></td>
+            <td>
+              <code>goToStepPage</code> now <b>verifies</b> where <code>goBack</code> landed (waits
+              500ms, re-checks <code>isOnStepPage</code>) and falls back to hard-navigating if one
+              hop wasn't enough.
+            </td>
+          </tr>
+          <tr>
+            <td><b>URL regexes</b></td>
+            <td>Patterns tested directly</td>
+            <td>
+              <code>safeMatch()</code> wraps every regex test — recorded/AI guides can carry invalid
+              patterns, which must never throw inside a React effect. Invalid
+              <code>urlPattern</code> ⇒ "always on track"; invalid
+              <code>advanceOnUrlPattern</code> ⇒ "never auto-complete".
+            </td>
+          </tr>
+          <tr>
+            <td><b>Mascot placement</b></td>
+            <td>
+              "drops him below if neither side fits" (aspirational — the code only moved
+              <code>left</code>)
+            </td>
+            <td>
+              Now true: the no-room fallback also sets <code>top = rect.bottom + margin</code>, so
+              the bubble no longer covers a full-width target like the top search bar.
+            </td>
+          </tr>
+          <tr>
+            <td><b>Voice</b></td>
+            <td>Spoken inside the highlight effect</td>
+            <td>
+              Split into its own effect keyed on the spoken <b>text</b>, so replacing the steps
+              array with a content-equivalent copy (the backend id merge) neither cuts off nor
+              restarts the announcement.
+            </td>
+          </tr>
+        </table>
+
+        <div class="warn">
+          <b>Known issue found while regenerating this doc.</b> In
+          <code>guide.js › sendGuideCommand</code> an inner <code>const result</code> shadows the
+          outer <code>let result</code>, so the block meant to clear stale overlays in
+          <em>other</em> frames after a success is <b>dead code</b> (and <code>anyOk</code> is never
+          set). A <code>broadcastGuideCommand()</code> helper was also added for "send to every
+          frame" semantics (true cross-frame <code>clear</code>, recording in all frames) but
+          <b>nothing calls it yet</b>. Until that's wired up, <code>clear</code> has
+          first-answer-wins semantics like every other command.
+        </div>
+
+        <!-- ============================================================ -->
+        <h2 class="sec" id="overview">1 &nbsp;The big picture</h2>
+        <p>
+          Baymax is a Chrome extension (Manifest V3). A Chrome extension is split across
+          <b>isolated JavaScript worlds</b> that cannot call each other's functions directly — they
+          can only pass messages. The whole guide engine is an exercise in shuttling one small
+          message across those worlds and back:
+        </p>
+
+        <div class="diagram">
+          <div class="ctx">
+            <div class="box b1">
+              <h5><span class="pill p-react">ui</span> Side panel</h5>
+              <small>A React app (the extension's UI)</small>
+              <ul>
+                <li><code>Guidance/index.jsx</code> — the director</li>
+                <li><code>guide.js</code> — the messenger</li>
+                <li><code>guides/*.js</code> — the scripts (imported data)</li>
+              </ul>
+            </div>
+            <div class="box b2">
+              <h5>Chrome APIs</h5>
+              <small>The message bus between worlds</small>
+              <ul>
+                <li><code>chrome.tabs.sendMessage</code> → page</li>
+                <li><code>chrome.runtime.sendMessage</code> → panel</li>
+                <li><code>chrome.tabs.onUpdated</code> (navigation)</li>
+                <li><code>chrome.webNavigation.getAllFrames</code></li>
+              </ul>
+            </div>
+            <div class="box b3">
+              <h5><span class="pill p-content">page</span> Content script</h5>
+              <small>Injected into console.cloud.google.com</small>
+              <ul>
+                <li><code>guide-overlay.js</code> — the hands</li>
+                <li>Runs inside every same-origin frame</li>
+                <li>Owns the mascot + highlight (Shadow DOM)</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="arrowrow">
+            <span class="chip">index.jsx</span> → calls → <span class="chip">guide.js</span> →
+            <b>chrome.tabs.sendMessage</b> →
+            <span class="chip">guide-overlay.js</span>
+            <span style="color: var(--accent)">&nbsp;(command: highlight / click / fill)</span>
+          </div>
+          <div class="arrowrow">
+            <span class="chip">guide-overlay.js</span> → <b>chrome.runtime.sendMessage</b> →
+            <span class="chip">listener in guide.js</span> → callback →
+            <span class="chip">index.jsx</span>
+            <span style="color: var(--bridge)"
+              >&nbsp;(event: CLICKED / FILLED / DISMISSED / GO_BACK)</span
+            >
+          </div>
+
+          <div class="legend">
+            <span><i style="background: var(--data)"></i> static data</span>
+            <span><i style="background: var(--react)"></i> side-panel logic</span>
+            <span><i style="background: var(--bridge)"></i> messaging bridge</span>
+            <span><i style="background: var(--content)"></i> runs on the GCP page</span>
+          </div>
+        </div>
+
+        <div class="key">
+          <b>The one sentence to remember:</b> <code>index.jsx</code> reads a step from a guide
+          file, hands it to <code>guide.js</code>, which serialises it into a
+          <code>BAYMAX_GUIDE</code> message that <code>guide-overlay.js</code> turns into a real
+          highlight on the page. When the user acts, the reverse trip fires a
+          <code>BAYMAX_GUIDE_*</code> event that tells <code>index.jsx</code> to advance — and each
+          completed step is persisted to the backend as it happens.
+        </div>
+
+        <!-- ============================================================ -->
+        <h2 class="sec" id="contexts">2 &nbsp;Why messages instead of function calls</h2>
+        <p>
+          The side panel and the page are <b>different origins in different processes</b>. The panel
+          is a <code>chrome-extension://…</code> document; the page is
+          <code>https://console.cloud.google.com</code>. They share no variables, no DOM, no
+          globals. Two channels bridge them:
+        </p>
+        <table>
+          <tr>
+            <th>Direction</th>
+            <th>API</th>
+            <th>Carries</th>
+            <th>Lives in</th>
+          </tr>
+          <tr>
+            <td>Panel → Page</td>
+            <td><code>chrome.tabs.sendMessage(tabId, msg, {frameId})</code></td>
+            <td>
+              A <code>BAYMAX_GUIDE</code> command (highlight, click, fill, clear, snapshot,
+              record-start/stop)
+            </td>
+            <td><code>guide.js › sendGuideCommand()</code></td>
+          </tr>
+          <tr>
+            <td>Page → Panel</td>
+            <td><code>chrome.runtime.sendMessage(msg)</code></td>
+            <td>
+              A <code>BAYMAX_GUIDE_*</code> event (user clicked / filled / dismissed / go-back) or a
+              <code>BAYMAX_RECORD_ACTION</code>
+            </td>
+            <td>
+              <code>guide-overlay.js › send()</code> → listeners registered by <code>guide.js</code>
+            </td>
+          </tr>
+          <tr>
+            <td>Browser → Panel</td>
+            <td><code>chrome.tabs.onUpdated</code></td>
+            <td>URL changes of <b>the pinned guided tab only</b> (incl. SPA route changes)</td>
+            <td><code>guide.js › onGcpUrlChanged()</code></td>
+          </tr>
+        </table>
+
+        <div class="changed">
+          <b>New: the pinned guided tab.</b> All tab-touching operations resolve through
+          <code>getGuidedTab()</code>. The first command of a run adopts the active Console tab and
+          remembers its id in <code>guidedTabId</code>; from then on the guide follows
+          <em>that</em> tab — focused or not — so another GCP tab can't hijack highlights, flag
+          off-track, or auto-advance a step. A pinned tab that navigates away from the Console is
+          treated as unavailable, but the pin is kept so the guide recovers the moment the user
+          brings it back; a closed tab drops the pin. <code>resetGuidedTab()</code> is called on a
+          fresh Guidance mount and at <code>startRecording()</code> so a new run adopts the tab the
+          user is on <em>now</em>.
+        </div>
+
+        <div class="note">
+          <b>The iframe wrinkle.</b> The GCP Console renders most pages inside a same-origin
+          <code>&lt;iframe&gt;</code>. A content script is injected into <em>every</em> frame, and
+          <code>sendMessage</code> only reaches frame&nbsp;0 by default. So
+          <code>guide.js</code> asks <code>chrome.webNavigation.getAllFrames</code> for the full
+          frame list and <b>broadcasts</b> the command to all of them, keeping the first frame that
+          answers <code>{ok:true}</code>.
+        </div>
+
+        <!-- ============================================================ -->
+        <h2 class="sec" id="protocol">3 &nbsp;The message protocol (the shared vocabulary)</h2>
+        <p>Everything below is just these messages. Keep this table open as a decoder ring.</p>
+
+        <h4>
+          Panel → Page &nbsp;<span class="mini"
+            >(type: <code>BAYMAX_GUIDE</code>, discriminated by <code>action</code>)</span
+          >
+        </h4>
+        <table>
+          <tr>
+            <th>action</th>
+            <th>Meaning</th>
+            <th>Key fields</th>
+          </tr>
+          <tr>
+            <td><code>highlight</code></td>
+            <td>Point at an element without touching it</td>
+            <td>
+              selector, extraSelector, role, name, text, href, avoid*, exactName, requireSelector,
+              <b>revealSelector, revealValue</b>, title, message, stepAction, stepNumber,
+              totalSteps, cheer
+            </td>
+          </tr>
+          <tr>
+            <td><code>click</code></td>
+            <td>Highlight, then programmatically click</td>
+            <td>same targeting fields</td>
+          </tr>
+          <tr>
+            <td><code>fill</code></td>
+            <td>Highlight, focus, and type a value</td>
+            <td>targeting fields + <code>value</code></td>
+          </tr>
+          <tr>
+            <td><code>lost</code></td>
+            <td>Show the "wrong page?" mascot with a Take-me-back button</td>
+            <td>title, message</td>
+          </tr>
+          <tr>
+            <td><code>clear</code></td>
+            <td>Remove all overlay UI</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><code>snapshot</code></td>
+            <td>Return the page's visible interactive elements (self-heal)</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><code>record-start</code> / <code>record-stop</code></td>
+            <td>Begin/stop capturing the user's actions</td>
+            <td>—</td>
+          </tr>
+        </table>
+
+        <h4>Page → Panel</h4>
+        <table>
+          <tr>
+            <th>type</th>
+            <th>Fires when…</th>
+            <th>Handled by</th>
+          </tr>
+          <tr>
+            <td><code>BAYMAX_GUIDE_CLICKED</code></td>
+            <td>User clicks the highlighted element themselves</td>
+            <td><code>onGuideStepEvent.onClicked</code></td>
+          </tr>
+          <tr>
+            <td><code>BAYMAX_GUIDE_FILLED</code></td>
+            <td>User finishes typing / picks a dropdown option</td>
+            <td><code>onGuideStepEvent.onFilled</code></td>
+          </tr>
+          <tr>
+            <td><code>BAYMAX_GUIDE_DISMISSED</code></td>
+            <td>User closes the mascot with its × button</td>
+            <td><code>onGuideStepEvent.onDismissed</code></td>
+          </tr>
+          <tr>
+            <td><code>BAYMAX_GUIDE_GO_BACK</code></td>
+            <td>User clicks the "lost" mascot / its back button</td>
+            <td><code>onGuideStepEvent.onGoBack</code></td>
+          </tr>
+          <tr>
+            <td><code>BAYMAX_RECORD_ACTION</code></td>
+            <td>Each captured click/fill while recording</td>
+            <td><code>onRecordedAction</code></td>
+          </tr>
+        </table>
+
+        <!-- ============================================================ -->
+        <h2 class="sec" id="data">
+          4 &nbsp;<span class="pill p-data">data</span> The scripts — <code>src/lib/guides/</code>
+        </h2>
+        <div class="filehdr">
+          <span class="path"
+            >baymax-extension/src/lib/guides/cloudSqlPostgres.js &nbsp;·&nbsp; cloudRun.js</span
+          >
+        </div>
+        <p>
+          These files have <b>no logic</b> — each exports one guide object with an <code>id</code>,
+          a <code>title</code>, optional <code>prerequisites</code>/<code>nextSteps</code>, and a
+          <code>steps[]</code> array. Every other file's behaviour is driven by the fields on these
+          step objects: a small domain-specific language whose "interpreter" is spread across the
+          other three files.
+        </p>
+        <ul>
+          <li>
+            <b><code>cloudSqlPostgres.js</code></b> — the 10-step Cloud SQL guide; still the
+            built-in default when there is no explicit guide and no session.
+          </li>
+          <li>
+            <b><code>cloudRun.js</code></b> — an <b>offline copy</b> of the official "Host a backend
+            on Cloud Run" guide. The live version is served from the backend (<code
+              >recorded_guides</code
+            >
+            rows with <code>is_official</code>; extras like
+            <code>prerequisites</code>/<code>nextSteps</code>/task id travel under
+            <code>meta</code>). <code>App.jsx</code> fetches it on chip tap and offers this bundled
+            copy only if the fetch fails and the user accepts the offline prompt. Keep it in sync
+            with <code>baymax-backend/data/official_cloud_run_guide.json</code>.
+          </li>
+        </ul>
+
+        <h3>The step vocabulary — what each field controls, and who reads it</h3>
+        <table>
+          <tr>
+            <th>Field</th>
+            <th>What it does</th>
+            <th>Read by</th>
+          </tr>
+          <tr>
+            <td><code>id</code></td>
+            <td>Stable step identifier</td>
+            <td>index.jsx (backend status updates)</td>
+          </tr>
+          <tr>
+            <td><code>title</code> / <code>description</code></td>
+            <td>Text shown in the step card, the speech bubble, and read aloud</td>
+            <td>index.jsx, overlay (bubble)</td>
+          </tr>
+          <tr>
+            <td><code>action</code></td>
+            <td>
+              <code>'click'</code> | <code>'fill'</code> | <code>'highlight'</code> — what "Do it
+              for me" performs and whether a click completes the step
+            </td>
+            <td>index.jsx, guide.js, overlay</td>
+          </tr>
+          <tr>
+            <td><code>selector</code></td>
+            <td>
+              Comma-separated CSS fallbacks. Also the <b>progress key</b> the click/fill watchers
+              report under
+            </td>
+            <td>overlay (resolver), index.jsx (compare)</td>
+          </tr>
+          <tr>
+            <td><code>value</code></td>
+            <td>Text to type for a <code>fill</code> step</td>
+            <td>overlay (fill)</td>
+          </tr>
+          <tr>
+            <td><code>name</code> / <code>text</code> / <code>role</code> / <code>href</code></td>
+            <td>
+              <b>Semantic intent</b> — the resilient resolver prefers these over the brittle
+              selector
+            </td>
+            <td>overlay (scoreCandidate)</td>
+          </tr>
+          <tr>
+            <td><code>exactName</code></td>
+            <td>
+              Require a whole-string name match (rejects "Cloud SQL for MySQL" when we want "Cloud
+              SQL")
+            </td>
+            <td>overlay</td>
+          </tr>
+          <tr>
+            <td><code>avoidText</code> / <code>avoidHref</code></td>
+            <td>Disqualify / penalise look-alikes ("Enterprise Plus", the Marketplace link)</td>
+            <td>overlay</td>
+          </tr>
+          <tr>
+            <td><code>requireSelector</code></td>
+            <td>
+              Only match the step's own selector — skip the generic element scan (for common words
+              like "Cloud SQL")
+            </td>
+            <td>overlay</td>
+          </tr>
+          <tr>
+            <td>
+              <code>revealSelector</code> / <code>revealValue</code>
+              <span class="pill p-new">new</span>
+            </td>
+            <td>
+              The control that re-summons a transient panel the target lives in (e.g. the
+              search-suggestions dropdown, which closes when the side panel takes focus):
+              focus/click it, refill <code>revealValue</code> if empty, wait 900ms, re-resolve
+            </td>
+            <td>overlay (tryReveal)</td>
+          </tr>
+          <tr>
+            <td><code>url</code></td>
+            <td>The page this step lives on — fallback destination for "Take me back"</td>
+            <td>guide.js</td>
+          </tr>
+          <tr>
+            <td><code>urlPattern</code></td>
+            <td>Regex the current tab URL must match for the user to be "on track"</td>
+            <td>index.jsx, guide.js</td>
+          </tr>
+          <tr>
+            <td><code>advanceOnUrlPattern</code></td>
+            <td>
+              Regex that, if the URL matches, means the step is <b>done</b> → auto-advance /
+              auto-skip
+            </td>
+            <td>index.jsx, guide.js</td>
+          </tr>
+          <tr>
+            <td><code>autoSkip</code></td>
+            <td>
+              Allow URL-based skipping of this step even below the "frontier" (after pressing Back),
+              once the tab has left the step's own page
+            </td>
+            <td>index.jsx</td>
+          </tr>
+          <tr>
+            <td><code>awaitNavigation</code></td>
+            <td>
+              This step submits a form — a click is <b>not</b> proof of success; only navigation is
+            </td>
+            <td>index.jsx (verifySubmit)</td>
+          </tr>
+        </table>
+
+        <div class="note">
+          <b>Regex tolerance.</b> Recorded and AI-generated guides can carry a
+          <code>urlPattern</code> that isn't a valid regex.
+          <code>guide.js › safeMatch()</code> catches the <code>RegExp</code> throw and the caller
+          picks the safe default: an invalid <code>urlPattern</code> counts as "always on track", an
+          invalid <code>advanceOnUrlPattern</code> as "never auto-complete".
+        </div>
+
+        <h3>Reading the 10 Cloud SQL steps as a state machine</h3>
+        <p>
+          The guide is a linear machine, but two mechanisms let it skip around:
+          <code>advanceOnUrlPattern</code> (jump forward when the page proves a step is done) and
+          <code>urlPattern</code> (flag "you wandered off").
+        </p>
+        <ul class="step-chain">
+          <li>
+            <b>Steps 1–2 — the search lead-in (page-agnostic).</b> No <code>urlPattern</code>, so
+            they work from <em>any</em> console page. Step 1 <code>fill</code>s "Cloud SQL" into the
+            top search box; step 2 <code>click</code>s the product result. Both share an
+            <code>advanceOnUrlPattern</code> that matches any Cloud SQL page <em>except</em> the
+            create/picker pages — the instant the tab lands there they auto-complete.
+            <span class="mini"
+              >Step 2 uses <code>exactName+requireSelector</code> because "Cloud SQL" also appears
+              as left-nav branding.</span
+            >
+          </li>
+          <li>
+            <b>Step 3 — "Create instance".</b> Lives on the Cloud SQL landing page (<code
+              >urlPattern</code
+            >
+            excludes the create form). The <code>href:'/sql/choose-instance-engine'</code> tips the
+            resolver toward the <em>direct</em> link on the empty-state page, so the no-instances
+            flow jumps straight to the engine picker.
+          </li>
+          <li>
+            <b>Step 4 — "New instance" menu item.</b> Only exists when the project already has
+            instances (a dropdown). When the list is empty there's no menu, so
+            <code>autoSkip + advanceOnUrlPattern</code> quietly skip this step.
+          </li>
+          <li>
+            <b>Step 5 — "Choose PostgreSQL".</b> The engine picker. Its <code>urlPattern</code> is
+            <em>only</em> the picker, and <code>advanceOnUrlPattern:'engine=PostgreSQL'</code> — so
+            choosing MySQL doesn't advance and instead goes off-track (Take me back).
+          </li>
+          <li>
+            <b>Steps 6–9 — fill/pick the form.</b> All pinned to
+            <code>urlPattern:'engine=PostgreSQL'</code>: instance ID (fill), password (highlight
+            only — never auto-typed), region (combobox), Enterprise edition (<code
+              >avoidText:'plus'</code
+            >
+            so it skips "Enterprise Plus").
+          </li>
+          <li>
+            <b>Step 10 — "Create instance" submit.</b> <code>awaitNavigation:true</code>: the click
+            alone isn't success. Only navigating to <code>/sql/instances</code> (its
+            <code>advanceOnUrlPattern</code>) proves the instance was created; otherwise the guide
+            stays put and asks the user to fix the flagged fields.
+          </li>
+        </ul>
+
+        <!-- ============================================================ -->
+        <h2 class="sec" id="react">
+          5 &nbsp;<span class="pill p-react">ui</span> The director —
+          <code>Guidance/index.jsx</code>
+        </h2>
+        <div class="filehdr">
+          <span class="path">baymax-extension/src/pages/Guidance/index.jsx</span>
+        </div>
+        <p>
+          This React component is the brain. It holds "which step are we on", subscribes to page
+          events and URL changes, and for every situation decides one of four outcomes:
+          <b>highlight</b> the step, <b>auto-advance</b> past it, show <b>off-track</b> ("Take me
+          back"), or show a <b>status message</b>.
+        </p>
+
+        <h3>5.1 &nbsp;State &amp; the derived "current step"</h3>
+        <pre><code><span class="kw">const</span> [stepIndex, setStepIndex] = <span class="fn">useState</span>(<span class="num">0</span>)   <span class="cmt">// ALWAYS starts at 0 — no localStorage</span>
+<span class="kw">const</span> [steps, setSteps]         = <span class="fn">useState</span>([])  <span class="cmt">// the actual step array in use</span>
+
+<span class="kw">const</span> safeStepIndex = steps.length ? Math.<span class="fn">min</span>(stepIndex, steps.length - <span class="num">1</span>) : <span class="num">0</span>
+<span class="kw">const</span> step         = steps[safeStepIndex]   <span class="cmt">// ← THE object everything below acts on</span>
+<span class="kw">const</span> isLastStep   = safeStepIndex === steps.length - <span class="num">1</span></code></pre>
+
+        <div class="changed">
+          <b>Changed: progress has ONE source of truth — the backend.</b> The old localStorage store
+          (keyed by guide id) was a second, competing source: every task and re-run of the same
+          guide shared one key, so a fresh start inherited the last run's abandoned step. Now
+          <code>markStepStatus(index, status)</code> is the <b>single write path</b> —
+          fire-and-forget <code>PATCH /sessions/{id}/steps/{step_id}</code>, a no-op without a
+          session (recorded guides / offline). Resume happens only through the backend:
+          <code>listSteps</code> → land on the first step whose status isn't
+          <code>completed</code>/<code>skipped</code>. The arrival effect (keyed on
+          <code>step.id</code>, not the index) marks each newly-current step
+          <code>in_progress</code>.
+        </div>
+
+        <p>
+          <code>safeStepIndex</code> is a defensive clamp: a resumed index can point past the end of
+          a (possibly shorter) step list, which would make <code>step</code> undefined and crash the
+          panel on <code>step.title</code>. Clamping keeps the render safe while an effect snaps the
+          stored index back into range.
+        </p>
+
+        <h4>The refs that make navigation sane</h4>
+        <table>
+          <tr>
+            <th>Ref</th>
+            <th>Purpose</th>
+          </tr>
+          <tr>
+            <td><code>advancedRef</code></td>
+            <td>
+              One-shot latch so a step can't auto-advance twice (e.g. click <em>and</em> URL change
+              both fire).
+            </td>
+          </tr>
+          <tr>
+            <td><code>backPressedRef</code></td>
+            <td>
+              Set when the user presses Back, so a stale later-page URL doesn't immediately bounce
+              them forward again. Cleared on any forward move.
+              <b>Now also gates the auto-advance checks themselves</b> (both in
+              <code>checkStep</code> and the URL listener).
+            </td>
+          </tr>
+          <tr>
+            <td><code>hiddenRef</code></td>
+            <td>
+              Set when the user dismisses the mascot with × — suppresses re-highlighting until "Show
+              me".
+            </td>
+          </tr>
+          <tr>
+            <td><code>maxReachedRef</code></td>
+            <td>
+              The <b>frontier</b>: the furthest step ever reached. URL auto-skip is only allowed
+              at/above the frontier (see below).
+            </td>
+          </tr>
+          <tr>
+            <td><code>stepIndexRef</code> <span class="pill p-new">new</span></td>
+            <td>
+              Live mirror of <code>stepIndex</code> so delayed callbacks ("Do it for me"'s 800ms
+              advance timer) can tell whether the guide already moved on since they were armed.
+            </td>
+          </tr>
+          <tr>
+            <td><code>submitTimerRef</code></td>
+            <td>
+              The pending "did the submit actually work?" check for an
+              <code>awaitNavigation</code> step; cleared on every step change.
+            </td>
+          </tr>
+        </table>
+
+        <div class="key">
+          <b>The frontier rule — the trickiest idea in the file.</b>
+          <code>advanceOnUrlPattern</code> exists to skip steps the page has genuinely moved past.
+          But if the user presses <b>Back</b> to redo step 3 while the tab is still parked on the
+          create-instance form, that stale URL satisfies the <code>advanceOnUrlPattern</code> of
+          steps 3, 4, 5… and would <em>cascade</em> them straight back to step&nbsp;10. So URL-based
+          advancing only fires when <code>atFrontier()</code> (<code
+            >stepIndex &gt;= maxReachedRef</code
+          >) — or for explicit <code>autoSkip</code> steps once the tab has physically left the
+          step's own page — and <b>never while <code>backPressedRef</code> is set</b>. Below the
+          frontier, only a real click/fill or the Next button advances, one step at a time.
+        </div>
+
+        <h3>5.2 &nbsp;Loading the steps (local sources are authoritative)</h3>
+        <p>
+          The load effect fills <code>steps</code> from whichever source applies —
+          <b>in this order</b>:
+        </p>
+        <ol>
+          <li>
+            <b>An explicit <code>guide</code> prop</b> (a recorded guide, the official Cloud Run
+            guide, or the built-in mock passed from App) → use <code>guide.steps</code>. Used
+            <em>even when a sessionId exists</em>.
+          </li>
+          <li>
+            <b><code>dynamicGuide</code></b> (an AI blueprint from chat) → use its steps. Also wins
+            over a session.
+          </li>
+          <li>
+            <b>No <code>sessionId</code></b> → fall back to the built-in
+            <code>CLOUD_SQL_POSTGRES_GUIDE.steps</code>.
+          </li>
+          <li>
+            <b>A backend session and no local copy</b> (i.e. resuming) →
+            <code>api.listSteps(sessionId)</code>, then land on the first step that isn't
+            <code>completed</code>/<code>skipped</code>.
+          </li>
+        </ol>
+        <div class="changed">
+          <b>Why local wins:</b> the backend session copy is <b>lossy</b> —
+          <code>schemas/step.py</code> drops the resolver fields (<code>name</code>,
+          <code>exactName</code>, <code>avoidText</code>, <code>awaitNavigation</code>, …). It must
+          never replace live local steps, even when the <code>sessionId</code> arrives mid-run; it's
+          only used when resuming, where the saved copy is the only source there is.
+        </div>
+
+        <h3>5.3 &nbsp;The heart: the "on step change" effect</h3>
+        <p>
+          Every time the current <b>step object</b> changes, the effect runs
+          <code>checkStep()</code> — the decision tree that decides what the user sees. Read it
+          top-to-bottom — order matters:
+        </p>
+        <div class="anno">
+          <div class="ln">
+            <div class="n">1</div>
+            <div class="d">
+              <b>Bail if hidden.</b> If the user dismissed the mascot (<code>hiddenRef</code>), do
+              nothing.
+            </div>
+          </div>
+          <div class="ln">
+            <div class="n">2</div>
+            <div class="d">
+              <b>Ask the guided tab where it is.</b> <code>await getCurrentGcpUrl()</code> (the
+              pinned tab, via <code>guide.js</code>).
+            </div>
+          </div>
+          <div class="ln">
+            <div class="n">3</div>
+            <div class="d">
+              <b>Already done?</b> If <code>!backPressedRef</code> and
+              <code>stepCompletedByUrl(step, url)</code> and (frontier, or an
+              <code>autoSkip</code> step that has left its page) → <code>autoAdvance()</code> and
+              stop.
+              <span class="mini"
+                >This is what makes steps 1–2 vanish when you're already on Cloud SQL.</span
+              >
+            </div>
+          </div>
+          <div class="ln">
+            <div class="n">4</div>
+            <div class="d">
+              <b>On the wrong page?</b> If the step has a <code>urlPattern</code> and the tab isn't
+              on it → set <code>offTrack</code>, show the status message, and
+              <code>showLostMascot()</code>.
+              <span class="mini"
+                >Crucially, it does NOT scan the wrong page for a same-named look-alike.</span
+              >
+            </div>
+          </div>
+          <div class="ln">
+            <div class="n">5</div>
+            <div class="d">
+              <b>Try to highlight.</b> Otherwise call
+              <code>highlightStep(step, mascotExtras)</code>. If it returns <code>{ok:true}</code> →
+              clear off-track/status and we're done.
+            </div>
+          </div>
+          <div class="ln">
+            <div class="n">6</div>
+            <div class="d">
+              <b>Not found on a page-agnostic step, and not on its page either?</b> → off-track +
+              lost mascot, rather than highlighting whatever shares the name.
+            </div>
+          </div>
+          <div class="ln">
+            <div class="n">7</div>
+            <div class="d">
+              <b>Not found → retry.</b> On <code>'not-found'</code>, retry up to
+              <code>HIGHLIGHT_RETRIES</code> (6) times, <code>700ms</code> apart — the element may
+              not have rendered yet (SPA still loading, dropdown opening).
+            </div>
+          </div>
+          <div class="ln">
+            <div class="n">8</div>
+            <div class="d">
+              <b>Give up gracefully.</b> After retries, show the mapped status message ("Navigate
+              there manually…").
+              <span class="mini"
+                >The self-heal LLM round-trip that used to run here is commented out —
+                <code>SELF-HEAL DISABLED</code>.</span
+              >
+            </div>
+          </div>
+        </div>
+        <p>
+          The cleanup sets <code>cancelled = true</code> so an in-flight retry/await from the
+          <em>previous</em> step can't fire after we've moved on — a classic React async-effect
+          guard.
+        </p>
+
+        <div class="changed">
+          <b>Changed: these effects are keyed on the step OBJECT, not the index.</b>
+          <code>steps</code> arrives asynchronously (mock, prop, or backend fetch); an index-only
+          dependency left the effects dormant on a fresh start — mounted at step 0 with an empty
+          array, they never re-ran when the steps filled in.
+          <b>Voice is also its own effect now</b>, keyed on the spoken text (<code
+            >`Step N: title. description`</code
+          >), so an id-merge that replaces the steps array with an equivalent copy neither cuts off
+          nor restarts the announcement.
+        </div>
+
+        <h3>5.4 &nbsp;The two subscription effects</h3>
+
+        <h4>URL changes → advance or flag off-track</h4>
+        <p><code>onGcpUrlChanged</code> fires for every navigation of the <b>pinned</b> tab:</p>
+        <ul>
+          <li>
+            If <code>!backPressedRef</code> and <code>stepCompletedByUrl</code> and (frontier or
+            autoSkip-left-page) → <code>autoAdvance()</code>. This is how clicking a search
+            suggestion — something we never explicitly watched — still completes the step.
+          </li>
+          <li>
+            Else if the step has a <code>urlPattern</code> and we're not on it → immediately show
+            off-track (no 1.2s wait, no scanning the wrong page — which could flash a stray
+            "PostgreSQL" highlight on the MySQL form).
+          </li>
+          <li>
+            Else, after a <code>1200ms</code> debounce (let the SPA settle), try
+            <code>highlightStep</code> again; if that says <code>'not-found'</code> and the tab
+            isn't on the step's page, show off-track.
+          </li>
+        </ul>
+
+        <h4>Page events → advance</h4>
+        <pre><code><span class="fn">onGuideStepEvent</span>({
+  <span class="fn">onClicked</span>: (selector) =&gt; {
+    <span class="kw">const</span> stepKey = step.selector || step.name          <span class="cmt">// same fallback the overlay reports under</span>
+    <span class="kw">if</span> (step.action !== <span class="str">'click'</span> || selector !== stepKey) <span class="kw">return</span>  <span class="cmt">// only a real click-step completes on click</span>
+    <span class="kw">if</span> (step.awaitNavigation) <span class="fn">verifySubmit</span>()          <span class="cmt">// submit steps: wait for navigation</span>
+    <span class="kw">else</span> <span class="fn">autoAdvance</span>()
+  },
+  <span class="fn">onFilled</span>: (selector) =&gt; {                          <span class="cmt">// typed a value OR picked a dropdown option</span>
+    <span class="kw">if</span> (selector === (step.selector || step.name)) <span class="fn">autoAdvance</span>()   <span class="cmt">// NOT gated on step.action</span>
+  },
+  <span class="fn">onDismissed</span>: () =&gt; { hiddenRef.current = <span class="kw">true</span>; <span class="fn">setStatusMessage</span>(HIDDEN_MESSAGE) },
+  <span class="fn">onGoBack</span>:    () =&gt; <span class="fn">handleTakeMeBack</span>(),
+})</code></pre>
+        <div class="note">
+          <b>Why the click gate matters.</b> On a <code>highlight</code> step (like the Region
+          dropdown), clicking the control merely <em>opens</em> it — the user still has to pick a
+          value — so <code>onClicked</code> deliberately ignores it (<code
+            >step.action !== 'click'</code
+          >). The actual selection arrives later as an <code>onFilled</code> event (the overlay's
+          <code>watchOptionSelect</code> reports the chosen option as a fill).
+        </div>
+
+        <h3>5.5 &nbsp;The buttons (explicit user commands)</h3>
+        <table>
+          <tr>
+            <th>Handler</th>
+            <th>What it does</th>
+          </tr>
+          <tr>
+            <td><code>handleShowMe</code></td>
+            <td>
+              Un-hide, then either offer Take-me-back (wrong page) or
+              <code>highlightStep</code> again.
+            </td>
+          </tr>
+          <tr>
+            <td><code>handleDoItForMe</code></td>
+            <td>
+              <code>runStepAction(step)</code> → overlay clicks/fills for the user. For a submit
+              step, <code>verifySubmit()</code>; else auto-advance after 800ms —
+              <b>but only if the guide is still on the step the button was pressed on</b> (<code
+                >stepIndexRef</code
+              >
+              guard: a navigating click may have advanced it already, and arriving at the new step
+              resets <code>advancedRef</code>, so that latch alone can't stop a double-advance).
+            </td>
+          </tr>
+          <tr>
+            <td><code>handleTakeMeBack</code></td>
+            <td>
+              <code>goToStepPage(step)</code> (verified browser Back, or the step's
+              <code>url</code>), then re-highlight after 1.5s.
+            </td>
+          </tr>
+          <tr>
+            <td><code>goNext</code> / <code>goPrev</code></td>
+            <td>
+              Manual navigation. <code>goNext</code> marks the departing step
+              <code>completed</code> on the backend; on the last step it calls
+              <code>finish()</code> (marks the session completed + celebration screen).
+              <code>goPrev</code> sets <code>backPressedRef</code>.
+            </td>
+          </tr>
+        </table>
+
+        <h4><code>verifySubmit()</code> — the anti-false-positive guard</h4>
+        <pre><code><span class="kw">const</span> <span class="fn">verifySubmit</span> = () =&gt; {
+  <span class="fn">clearTimeout</span>(submitTimerRef.current)
+  <span class="fn">setStatusMessage</span>(<span class="str">''</span>)
+  submitTimerRef.current = <span class="fn">setTimeout</span>(<span class="kw">async</span> () =&gt; {
+    <span class="kw">if</span> (advancedRef.current) <span class="kw">return</span>                 <span class="cmt">// navigation already advanced us → success</span>
+    <span class="kw">const</span> tabInfo = <span class="kw">await</span> <span class="fn">getCurrentGcpUrl</span>()
+    <span class="kw">if</span> (tabInfo?.ok &amp;&amp; <span class="fn">stepCompletedByUrl</span>(step, tabInfo.url)) <span class="kw">return</span>
+    <span class="fn">setStatusMessage</span>(SUBMIT_BLOCKED_MESSAGE)          <span class="cmt">// still on the form → GCP rejected it</span>
+  }, SUBMIT_VERIFY_MS <span class="cmt">/* 2200ms */</span>)
+}</code></pre>
+        <p>
+          A successful "Create instance" navigates to the instances list within ~2.2s, and
+          <code>onGcpUrlChanged</code> will already have advanced the guide. If we're still on the
+          form after the timeout, the create was rejected — so instead of celebrating, Baymax tells
+          the user to fix the flagged fields.
+        </p>
+
+        <!-- ============================================================ -->
+        <h2 class="sec" id="bridge">
+          6 &nbsp;<span class="pill p-bridge">bridge</span> The messenger — <code>guide.js</code>
+        </h2>
+        <div class="filehdr"><span class="path">baymax-extension/src/lib/guide.js</span></div>
+        <p>
+          Every function here is a thin adapter between "a step object" and "a Chrome message". It
+          never touches the DOM of the GCP page — it only talks to the content script. There are
+          three groups: <b>commands</b> (panel → page), <b>subscriptions</b> (page → panel), and
+          <b>pure helpers</b> (URL logic + recording generalisation).
+        </p>
+
+        <h3>6.1 &nbsp;The pinned tab &amp; frames</h3>
+        <pre><code><span class="kw">let</span> guidedTabId = <span class="kw">null</span>   <span class="cmt">// the ONE Console tab this run follows</span>
+
+<span class="kw">async function</span> <span class="fn">getGuidedTab</span>() {
+  <span class="kw">if</span> (guidedTabId != <span class="kw">null</span>) {
+    <span class="kw">try</span> {
+      <span class="kw">const</span> tab = <span class="kw">await</span> chrome.tabs.<span class="fn">get</span>(guidedTabId)
+      <span class="kw">return</span> GCP_ORIGIN.<span class="fn">test</span>(tab.url || <span class="str">''</span>) ? tab : <span class="kw">null</span>  <span class="cmt">// left the console → unavailable, pin kept</span>
+    } <span class="kw">catch</span> { guidedTabId = <span class="kw">null</span> }                          <span class="cmt">// tab closed → re-adopt below</span>
+  }
+  <span class="kw">const</span> [tab] = <span class="kw">await</span> chrome.tabs.<span class="fn">query</span>({ active: <span class="kw">true</span>, currentWindow: <span class="kw">true</span> })
+  <span class="kw">if</span> (!tab || !GCP_ORIGIN.<span class="fn">test</span>(tab.url || <span class="str">''</span>)) <span class="kw">return</span> <span class="kw">null</span>
+  guidedTabId = tab.id                                       <span class="cmt">// ← adopt (pin) the active tab</span>
+  <span class="kw">return</span> tab
+}</code></pre>
+        <p>
+          <code>isExtensionContext()</code> guards every entry point so the same code runs
+          harmlessly in a plain browser tab (during dev) where <code>chrome.tabs</code> doesn't
+          exist — functions return a tidy <code>{ok:false}</code> instead of throwing.
+        </p>
+
+        <h4><code>sendGuideCommand(message)</code> — the broadcast core</h4>
+        <div class="anno">
+          <div class="ln">
+            <div class="n">1</div>
+            <div class="d">
+              Get the guided tab (pinned, or adopt the active GCP tab), or return
+              <code>{ok:false, error:'no-gcp-tab'}</code>.
+            </div>
+          </div>
+          <div class="ln">
+            <div class="n">2</div>
+            <div class="d">
+              Ask <code>chrome.webNavigation.getAllFrames</code> for every frame (falls back to just
+              frame 0 if unavailable).
+            </div>
+          </div>
+          <div class="ln">
+            <div class="n">3</div>
+            <div class="d">
+              Send the message to each frame in turn; <b>return the first</b>
+              <code>{ok:true}</code>. Frames with no listener (about:blank) just throw and are
+              skipped.
+            </div>
+          </div>
+          <div class="ln">
+            <div class="n">4</div>
+            <div class="d">
+              If none succeeded, return the last error (e.g. <code>'not-found'</code>) so the panel
+              can react.
+            </div>
+          </div>
+        </div>
+        <div class="warn">
+          <b>Dead code alert (see §0).</b> The function also contains a block that would clear stale
+          overlays in the other frames after a success, plus a sibling
+          <code>broadcastGuideCommand()</code> ("ok if ANY frame acknowledged" — intended for
+          <code>clear</code> and recording). The block is unreachable due to a shadowed
+          <code>result</code> variable and the helper is never called — so today every command,
+          including <code>clear</code>, is first-answer-wins.
+        </div>
+        <p>
+          Every command wrapper — <code>highlightStep</code>, <code>runStepAction</code>,
+          <code>showLostMascot</code>, <code>clearGuideHighlight</code>,
+          <code>startRecording</code>, <code>stopRecording</code> — is a one-line call to
+          <code>sendGuideCommand</code> with a different <code>action</code>. Note the renames as
+          data crosses the boundary: the step's <code>description</code> becomes the message's
+          <code>message</code>, and the step's <code>action</code> becomes
+          <code>stepAction</code> (so it doesn't clash with the message's own
+          <code>action:'highlight'</code>). <code>runStepAction</code> maps
+          <code>step.action</code> to the message's <code>action</code> (<code>fill</code> vs
+          <code>click</code>) and includes <code>value</code>. Both also forward
+          <code>extraSelector</code> (self-heal channel) and
+          <code>revealSelector/revealValue</code>.
+        </p>
+
+        <h3>6.2 &nbsp;The subscription side (page → panel)</h3>
+        <pre><code><span class="kw">export function</span> <span class="fn">onGuideStepEvent</span>({ onClicked, onFilled, onDismissed, onGoBack }) {
+  <span class="kw">const</span> listener = (msg) =&gt; {
+    <span class="kw">if</span> (msg?.type === <span class="str">'BAYMAX_GUIDE_CLICKED'</span>)   onClicked?.(msg.selector)
+    <span class="kw">if</span> (msg?.type === <span class="str">'BAYMAX_GUIDE_FILLED'</span>)    onFilled?.(msg.selector, msg.value)
+    <span class="kw">if</span> (msg?.type === <span class="str">'BAYMAX_GUIDE_DISMISSED'</span>) onDismissed?.()
+    <span class="kw">if</span> (msg?.type === <span class="str">'BAYMAX_GUIDE_GO_BACK'</span>)   onGoBack?.()
+  }
+  chrome.runtime.onMessage.<span class="fn">addListener</span>(listener)
+  <span class="kw">return</span> () =&gt; chrome.runtime.onMessage.<span class="fn">removeListener</span>(listener)   <span class="cmt">// unsubscribe</span>
+}</code></pre>
+        <p>
+          <code>onGcpUrlChanged(cb)</code> wraps <code>chrome.tabs.onUpdated</code> — but now
+          filters by <b>identity, not focus</b>: only the pinned <code>guidedTabId</code> drives the
+          guide. Another GCP tab can't flag off-track or auto-advance just because the user switched
+          to it while it navigated — and a guided-tab navigation that finishes while the user is
+          elsewhere still counts. No pin yet ⇒ the event is ignored (adopting from a navigation
+          would pin whichever tab happened to move first).
+        </p>
+
+        <h3>6.3 &nbsp;The pure URL helpers</h3>
+        <table>
+          <tr>
+            <th>Function</th>
+            <th>Logic</th>
+          </tr>
+          <tr>
+            <td><code>isOnStepPage(step, url)</code></td>
+            <td>
+              No <code>urlPattern</code> (or an invalid one) → always true ("location-agnostic").
+              Else test the regex via <code>safeMatch</code>.
+            </td>
+          </tr>
+          <tr>
+            <td><code>stepCompletedByUrl(step, url)</code></td>
+            <td>
+              No <code>advanceOnUrlPattern</code> (or an invalid one) → never auto-complete. Else
+              test the regex.
+            </td>
+          </tr>
+          <tr>
+            <td><code>goToStepPage(step)</code></td>
+            <td>
+              <code>chrome.tabs.goBack</code> first (preserves the user's place),
+              <b>then verifies</b>: wait 500ms for the SPA route to settle, re-read the tab, and if
+              it still isn't on the step's page (a multi-page wander) fall back to hard-navigating
+              to <code>step.url</code> — also the fallback when there's no history at all.
+            </td>
+          </tr>
+        </table>
+
+        <h3>
+          6.4 &nbsp;<code>captureSnapshot()</code> — the self-heal collector
+          <span class="mini">(currently disabled in index.jsx)</span>
+        </h3>
+        <p>
+          Unlike the commands, this one does <b>not</b> take the first frame that answers. The
+          element being hunted could be in any iframe, so it queries every frame, merges all their
+          element lists (deduped by <code>selector|name|href</code>), and caps the result at 120
+          elements so a busy page can't blow up the LLM prompt. It's the "read the whole page" half
+          of the self-heal feature.
+        </p>
+
+        <h3>6.5 &nbsp;Recording &amp; generalisation</h3>
+        <p>
+          The recorder lets a user capture their own guide. <code>startRecording()</code> first
+          calls <code>resetGuidedTab()</code> — a recording targets the tab the user is on
+          <em>right now</em>, not one pinned by an earlier run — then toggles capture on the page;
+          <code>onRecordedAction(cb)</code> streams each captured action back. The interesting logic
+          is <b>generalising</b> a recorded step so it replays on <em>any</em> project/instance:
+        </p>
+        <ul>
+          <li>
+            <code>volatileTokensFromUrl(url)</code> — pulls the volatile identifiers out of the URL:
+            the <code>project=…</code> query values and the instance/resource path segment (with a
+            stop-word list so console path words like <code>instances</code>,
+            <code>overview</code> are never mistaken for ids).
+          </li>
+          <li>
+            <code>detectInstanceSpecific(name, text, url)</code> — true when a recorded label embeds
+            one of those tokens (e.g. "View more actions for <b>my-instance-a</b>"), so the "Match
+            any instance" toggle is worth offering.
+          </li>
+          <li>
+            <code>applyGeneric(step)</code> — strips those tokens from
+            <code>name</code>/<code>text</code>, drops a <code>selector</code> pinned to them, and
+            loosens <code>exactName</code> to a contains-match — so the step matches the
+            <em>same</em> control on a different instance.
+          </li>
+          <li>
+            <code>recordedActionToStep(action, index)</code> — converts a raw fingerprint into a
+            guide step, turning fill values into empty placeholders so secrets aren't baked into a
+            shared guide.
+          </li>
+        </ul>
+
+        <!-- ============================================================ -->
+        <h2 class="sec" id="content">
+          7 &nbsp;<span class="pill p-content">page</span> The hands — <code>guide-overlay.js</code>
+        </h2>
+        <div class="filehdr"><span class="path">baymax-extension/public/guide-overlay.js</span></div>
+        <p>
+          This is a <b>classic content script</b> (plain JS, no imports, wrapped in an IIFE)
+          injected into every frame of the GCP console. It receives
+          <code>BAYMAX_GUIDE</code> messages and does the physical work: find the element, draw the
+          mascot, click/fill, and report back. Four subsystems: the <b>resolver</b>, the
+          <b>renderer</b>, the <b>watchers</b>, and the <b>recorder</b>.
+        </p>
+
+        <h3>7.1 &nbsp;The message entry point</h3>
+        <pre><code>chrome.runtime.onMessage.<span class="fn">addListener</span>(<span class="kw">function</span> (msg, sender, sendResponse) {
+  <span class="kw">if</span> (msg.type !== <span class="str">'BAYMAX_GUIDE'</span>) <span class="kw">return</span>
+  <span class="kw">var</span> result
+  <span class="kw">if</span> (msg.action === <span class="str">'highlight'</span>) result = <span class="fn">highlight</span>(<span class="fn">intentFromMsg</span>(msg), { title, message, stepAction, ... })
+  <span class="kw">else if</span> (msg.action === <span class="str">'click'</span>)  result = <span class="fn">click</span>(<span class="fn">intentFromMsg</span>(msg))
+  <span class="kw">else if</span> (msg.action === <span class="str">'fill'</span>)   result = <span class="fn">fill</span>(<span class="fn">intentFromMsg</span>(msg), msg.value)
+  <span class="kw">else if</span> (msg.action === <span class="str">'lost'</span>)   result = <span class="fn">showLost</span>({ title, message })
+  <span class="cmt">// … clear / snapshot / record-start / record-stop …</span>
+  <span class="fn">sendResponse</span>(result)   <span class="cmt">// { ok:true } or { ok:false, error:'not-found' } → travels back to guide.js</span>
+})</code></pre>
+        <p>
+          <code>intentFromMsg(msg)</code> repacks the targeting fields (selector, extraSelector,
+          role, name, text, href, avoid*, exactName, requireSelector,
+          <b>revealSelector, revealValue</b>) into an <b>intent</b>
+          object — the currency of the resolver.
+        </p>
+
+        <h3>7.2 &nbsp;The resilient resolver — the cleverest part</h3>
+        <p>
+          A single CSS selector breaks constantly on the GCP console (custom
+          <code>&lt;mat-*&gt;</code> components, layout that changes when the instance list is
+          non-empty, off-screen look-alikes). So instead of trusting one selector, the resolver
+          <b>scores every candidate element on the live page</b> and picks the best visible one.
+          Role + accessible-name beat brittle selectors.
+        </p>
+
+        <h4>
+          Step 1 — gather candidates &nbsp;<span class="mini">(<code>candidatePool</code>)</span>
+        </h4>
+        <ul>
+          <li>
+            Every element matching the step's <code>selector</code> (tagged
+            <code>fromSelector:true</code> for a baseline boost).
+          </li>
+          <li>
+            Every element matching <code>extraSelector</code> (the self-heal channel — a live
+            selector the backend picked).
+          </li>
+          <li>
+            <b>Unless</b> <code>requireSelector</code> is set: <em>all</em> interactive-ish elements
+            on the page (<code>a, button, input, mat-select, [role=…]</code>, etc.), so a moved
+            element can still be found by name.
+          </li>
+        </ul>
+
+        <h4>
+          Step 2 — score each candidate &nbsp;<span class="mini"
+            >(<code>scoreCandidate</code>)</span
+          >
+        </h4>
+        <table>
+          <tr>
+            <th>Signal</th>
+            <th>Effect on score</th>
+          </tr>
+          <tr>
+            <td>Not visible</td>
+            <td><code>-Infinity</code> (disqualified)</td>
+          </tr>
+          <tr>
+            <td>Matched a selector</td>
+            <td>+35</td>
+          </tr>
+          <tr>
+            <td><code>avoidText</code> appears in the element</td>
+            <td><code>-Infinity</code> (drops "Enterprise Plus", doc/marketplace rows)</td>
+          </tr>
+          <tr>
+            <td><code>name</code> exact match (<code>exactName</code>)</td>
+            <td>+120, else <b>disqualified</b></td>
+          </tr>
+          <tr>
+            <td><code>name</code> exact / contains / in text</td>
+            <td>+100 / +60 / +35 — <b>no match at all → disqualified</b></td>
+          </tr>
+          <tr>
+            <td><code>text</code> contains</td>
+            <td>+25</td>
+          </tr>
+          <tr>
+            <td><code>role</code> matches</td>
+            <td>+20</td>
+          </tr>
+          <tr>
+            <td><code>href</code> contains</td>
+            <td>+25; <code>avoidHref</code> −100</td>
+          </tr>
+          <tr>
+            <td>In viewport</td>
+            <td>+15</td>
+          </tr>
+          <tr>
+            <td>Is <code>document.activeElement</code></td>
+            <td>+30 (decisive for the focused search box)</td>
+          </tr>
+          <tr>
+            <td>Compact element (area &lt; 90,000&nbsp;px²)</td>
+            <td>+5 <span class="pill p-new">new in doc</span></td>
+          </tr>
+          <tr>
+            <td>Long <code>textContent</code></td>
+            <td>
+              penalty up to −12 (prefer the tight inner control, not the wrapping
+              <code>&lt;div&gt;</code>)
+            </td>
+          </tr>
+        </table>
+        <div class="key">
+          <b>The "name MUST match" rule.</b> When a step names its target, a candidate that doesn't
+          match the name scores <code>-Infinity</code>. This is why an un-rendered element makes the
+          step return <code>'not-found'</code> and <em>retry</em> instead of highlighting a random
+          selector hit — pointing at the wrong thing is worse than waiting.
+          <code>resolveTarget</code> only accepts a winner whose score clears
+          <code>ACCEPT_THRESHOLD (45)</code>; otherwise it returns <code>null</code> →
+          <code>{ok:false, error:'not-found'}</code>.
+        </div>
+
+        <h4>
+          <span class="pill p-new">new</span> <code>tryReveal(intent)</code> — resurrect a transient
+          panel
+        </h4>
+        <p>
+          Some targets only exist while a transient panel is open — the "Cloud Run" search result
+          lives in the search-suggestions dropdown, which closes the instant the user clicks "Show
+          me"/"Do it for me" in the side panel (the page loses focus). A step can declare
+          <code>revealSelector</code>, the control that summons the panel back: the overlay
+          focuses/clicks it, refills it with <code>revealValue</code> if the console cleared it (via
+          the native value setter + an <code>input</code> event so the framework notices), waits
+          <code>REVEAL_WAIT_MS (900ms)</code>, and re-resolves.
+        </p>
+
+        <h3>7.3 &nbsp;Rendering the highlight &amp; mascot</h3>
+        <p>
+          All injected UI lives inside a <b>Shadow DOM</b> on one zero-size host element
+          (<code>ensureRoot</code>), so the console's global CSS can't restyle the mascot and our
+          styles can't leak into the page. On localhost the root is <code>open</code> (so tests can
+          peek in); in production it's <code>closed</code>.
+        </p>
+        <p><code>renderHighlight(el, reportKey, opts, intent)</code> is the workhorse:</p>
+        <div class="anno">
+          <div class="ln">
+            <div class="n">1</div>
+            <div class="d">
+              <code>clearOverlay()</code> — tear down any previous highlight and all its watchers.
+            </div>
+          </div>
+          <div class="ln">
+            <div class="n">2</div>
+            <div class="d">
+              Remember <code>currentIntent / currentReportKey / currentOpts</code> so the reposition
+              loop can re-resolve later.
+            </div>
+          </div>
+          <div class="ln">
+            <div class="n">3</div>
+            <div class="d">
+              If the element isn't <code>isWellInView</code> (comfortably below the fixed top bar),
+              <code>scrollIntoView({block:'center'})</code>.
+            </div>
+          </div>
+          <div class="ln">
+            <div class="n">4</div>
+            <div class="d">
+              <code>buildMascot(opts)</code> — the SVG Baymax + speech bubble (title/description) +
+              "Step X of Y" board + cheer; and <code>positionOverlay(el)</code> — the pulsing
+              outline box.
+            </div>
+          </div>
+          <div class="ln">
+            <div class="n">5</div>
+            <div class="d">
+              Attach <code>scroll</code>/<code>resize</code> repositioners +
+              <code>startReposition()</code> (the rAF glue loop).
+            </div>
+          </div>
+          <div class="ln">
+            <div class="n">6</div>
+            <div class="d">
+              <code>watchElement(el, reportKey)</code> — report a user click. For inputs/fill steps
+              also <code>watchFill</code>; for fill steps also <code>watchFillFocus</code> +
+              <code>watchFillDoc</code>; for dropdowns <code>watchOptionSelect</code>.
+            </div>
+          </div>
+        </div>
+        <p class="mini">
+          The <code>reportKey</code> is <code>intent.selector || intent.name</code> — the exact
+          string <code>index.jsx</code> compares against in
+          <code>onClicked</code>/<code>onFilled</code>. That's the contract that ties "the user
+          clicked <em>this</em>" back to "the current step is done".
+        </p>
+
+        <h4>The mascot positioning</h4>
+        <p>
+          <code>positionMascot(el)</code> stands Baymax to the element's right when there's room
+          (his arm points left at it), flips him to the left otherwise — and when
+          <b>neither side fits</b> (a full-width target like the top search bar) drops the whole
+          column to <code>rect.bottom + 16px</code>, fully under the highlight, instead of clamping
+          to the top of the viewport where the bubble used to cover the element. When the target
+          scrolls out of view he fades out (<code>baymax-offscreen</code>) and waits with his
+          element rather than chasing the user.
+        </p>
+
+        <h3>7.4 &nbsp;The self-healing reposition loop</h3>
+        <p>
+          <code>startReposition()</code> runs a <code>requestAnimationFrame</code> loop that keeps
+          the outline glued to the target. It heals two failure modes seen on the create-instance
+          form when a validation error appears:
+        </p>
+        <ul>
+          <li>
+            <b>The field moves</b> (the error pushes it down): recompute its rect and reposition.
+            Guarded by a cheap key (<code>top,left,width,height</code>) so it only restyles when the
+            box actually changes — idle cost stays ~one rect read per frame.
+          </li>
+          <li>
+            <b>The field is replaced</b> (the framework re-renders the form, detaching the node):
+            re-run <code>resolveTarget(currentIntent)</code> and <code>reanchorHighlight</code> onto
+            the fresh node — an automatic "Show me" the user never has to press. Re-resolving is
+            throttled (fast — 200ms — while the node is gone, otherwise every
+            <code>RERESOLVE_MS = 1200ms</code>) so it never scans the DOM every frame.
+          </li>
+        </ul>
+
+        <h3>7.5 &nbsp;Doing it for the user — <code>click()</code> and <code>fill()</code></h3>
+        <pre><code><span class="kw">function</span> <span class="fn">click</span>(intent) {
+  <span class="kw">var</span> el = <span class="fn">resolveTarget</span>(intent)
+  <span class="kw">if</span> (!el) <span class="kw">return</span> { ok: <span class="kw">false</span>, error: <span class="str">'not-found'</span> }
+  <span class="fn">renderHighlight</span>(el, ...)
+  <span class="fn">setTimeout</span>(<span class="kw">function</span> () {
+    <span class="fn">unwatchElement</span>()          <span class="cmt">// stop watching FIRST, or we'd report our own click and advance twice</span>
+    <span class="fn">clickTarget</span>(el).<span class="fn">click</span>()   <span class="cmt">// mat-checkbox/radio: drill to the real inner input/label</span>
+    <span class="fn">clearOverlay</span>()
+  }, <span class="num">600</span>)
+  <span class="kw">return</span> { ok: <span class="kw">true</span> }
+}</code></pre>
+        <p>
+          <code>fill()</code> is analogous: it focuses the element, sets <code>.value</code> via the
+          native property setter (so React/Angular notice), then dispatches <code>input</code> +
+          <code>change</code> events. It calls <code>unwatchFill()</code> first for the same reason
+          — otherwise the dispatched event would also fire <code>BAYMAX_GUIDE_FILLED</code> and
+          double-advance.
+        </p>
+        <div class="warn">
+          <b>The Angular Material gotcha.</b> A <code>&lt;mat-checkbox&gt;</code>/<code
+            >&lt;mat-radio-button&gt;</code
+          >
+          host's own <code>.click()</code> does <em>not</em> toggle the control — only its inner
+          native <code>&lt;input&gt;</code> (or <code>&lt;label&gt;</code>) does.
+          <code>clickTarget(el)</code> drills down to that real toggle, while the highlight still
+          frames the whole (bigger, visible) host.
+        </div>
+
+        <h3>7.6 &nbsp;The watchers — how the user's own actions complete a step</h3>
+        <p>
+          The whole point of "guide, don't take over" is that the user usually clicks themselves.
+          Several watchers cover the ways they can act:
+        </p>
+        <table>
+          <tr>
+            <th>Watcher</th>
+            <th>Catches</th>
+            <th>Reports</th>
+          </tr>
+          <tr>
+            <td><code>watchElement</code></td>
+            <td>A click on the highlighted element</td>
+            <td><code>BAYMAX_GUIDE_CLICKED</code></td>
+          </tr>
+          <tr>
+            <td><code>watchFill</code></td>
+            <td>Typing into the highlighted input (debounced 1.1s)</td>
+            <td><code>BAYMAX_GUIDE_FILLED</code></td>
+          </tr>
+          <tr>
+            <td><code>watchOptionSelect</code></td>
+            <td>
+              Picking a <code>mat-option</code> in a CDK overlay appended to
+              <code>&lt;body&gt;</code> (outside the control)
+            </td>
+            <td><code>BAYMAX_GUIDE_FILLED</code></td>
+          </tr>
+          <tr>
+            <td><code>watchFillFocus</code></td>
+            <td>
+              The user focusing a <em>different</em> real text field — re-anchors the highlight onto
+              it
+            </td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><code>watchFillDoc</code></td>
+            <td>
+              Typing <em>anywhere</em> on the page (the console search box swaps in a fresh input),
+              debounced 1.1s
+            </td>
+            <td><code>BAYMAX_GUIDE_FILLED</code></td>
+          </tr>
+        </table>
+        <p class="mini">
+          <code>watchFillFocus</code> and <code>watchFillDoc</code> use
+          <code>e.composedPath()[0]</code> so a field inside a web-component's shadow tree is seen
+          as the real <code>&lt;input&gt;</code> (the bubbled event's target is otherwise retargeted
+          to the shadow host, which has no <code>.value</code>). Both exist because the resolver has
+          to pick a target <em>before</em> the user interacts, but the search box only reveals its
+          real input once clicked.
+        </p>
+
+        <h3>7.7 &nbsp;Snapshot &amp; recorder</h3>
+        <p>
+          <code>collectSnapshot()</code> returns a compact list of the page's
+          <em>visible</em> interactive elements, each described the way the resolver reads them
+          (role + accessible name + text + href) plus a live <code>cssPath</code>. Sending only
+          elements that <em>actually exist</em> grounds any selector the self-heal LLM returns.
+        </p>
+        <p>
+          While recording, <code>startRecording()</code> attaches capture-phase
+          <code>click</code>/<code>input</code> listeners. Each is <code>fingerprintElement</code>'d
+          (the same signals the resolver reads back) and sent as <code>BAYMAX_RECORD_ACTION</code>.
+          <code>recordTarget</code> redirects a bare <code>&lt;label&gt;</code> to the control it
+          labels so the fingerprint has a stable role and name. This is the "write" side; the
+          resolver is the "read" side of the exact same intent vocabulary.
+        </p>
+
+        <!-- ============================================================ -->
+        <h2 class="sec" id="flow-open">8 &nbsp;End-to-end flow walkthroughs</h2>
+        <p>Now the payoff — tracing a real command across all four files.</p>
+
+        <h3>8.1 &nbsp;Opening a step (the happy path)</h3>
+        <ol class="step-chain">
+          <li>
+            <b><span class="pill p-data">data</span> The step</b> — <code>index.jsx</code> reads
+            <code>step = steps[safeStepIndex]</code> (say step 6, "Name your instance",
+            <code>action:'fill'</code>).
+          </li>
+          <li>
+            <b><span class="pill p-react">ui</span> checkStep()</b> — the effect asks
+            <code>getCurrentGcpUrl()</code> (the pinned tab), confirms we're on
+            <code>engine=PostgreSQL</code> (its <code>urlPattern</code>), then calls
+            <code>highlightStep(step, mascotExtras)</code>.
+          </li>
+          <li>
+            <b><span class="pill p-bridge">bridge</span> highlightStep()</b> — spreads the step's
+            fields into a <code>{type:'BAYMAX_GUIDE', action:'highlight', …}</code> message and
+            <code>sendGuideCommand</code> broadcasts it to every frame of the tab.
+          </li>
+          <li>
+            <b><span class="pill p-content">page</span> The listener</b> —
+            <code>guide-overlay.js</code> receives it, <code>intentFromMsg</code> builds the intent,
+            <code>highlight()</code> → <code>resolveTarget()</code> scores the page's inputs and
+            picks the instance-ID field (name "Instance ID" wins).
+          </li>
+          <li>
+            <b><span class="pill p-content">page</span> renderHighlight()</b> — scrolls it into
+            view, draws the pulsing box + Baymax with the bubble "Name your instance" and "Step 6 of
+            10", and attaches <code>watchFill</code>. Returns <code>{ok:true}</code>.
+          </li>
+          <li>
+            <b>↩ back through the chain</b> — <code>{ok:true}</code> resolves
+            <code>sendGuideCommand</code> → <code>highlightStep</code> →
+            <code>checkStep</code> clears any status message. The user sees the highlight.
+          </li>
+        </ol>
+
+        <h3 id="flow-advance">8.2 &nbsp;The user acts → the step advances (and is persisted)</h3>
+        <ol class="step-chain">
+          <li>
+            <b><span class="pill p-content">page</span> User types</b> "baymax-postgres" into the
+            field. <code>watchFill</code>'s debounce fires after 1.1s.
+          </li>
+          <li>
+            <b><span class="pill p-content">page</span> Report</b> —
+            <code>send({type:'BAYMAX_GUIDE_FILLED', selector: reportKey, value})</code> →
+            <code>chrome.runtime.sendMessage</code>.
+          </li>
+          <li>
+            <b><span class="pill p-bridge">bridge</span> Relay</b> — the listener registered by
+            <code>onGuideStepEvent</code> matches the type and calls
+            <code>onFilled(selector, value)</code>.
+          </li>
+          <li>
+            <b><span class="pill p-react">ui</span> Decide</b> — <code>onFilled</code> checks
+            <code>selector === (step.selector || step.name)</code>; it matches, so
+            <code>autoAdvance()</code> → <code>goNext()</code> → the departing step is PATCHed
+            <code>completed</code> on the backend (<code>markStepStatus</code>) and
+            <code>setStepIndex(i+1)</code>.
+          </li>
+          <li>
+            <b>↻ Loop</b> — the step object changed, so the "on step change" effect re-runs, the
+            arrival effect marks the new step <code>in_progress</code>, and step 7 opens exactly as
+            in 8.1.
+          </li>
+        </ol>
+
+        <h3>8.3 &nbsp;Auto-skip via URL (steps 1–2 disappearing)</h3>
+        <ol class="step-chain">
+          <li>User is already on <code>/sql/instances</code> when the guide starts at step 1.</li>
+          <li>
+            <b><span class="pill p-react">ui</span></b> <code>checkStep()</code> calls
+            <code>getCurrentGcpUrl()</code>; <code>stepCompletedByUrl(step1, url)</code> is true and
+            we're <code>atFrontier()</code> (and Back wasn't just pressed) →
+            <code>autoAdvance()</code>.
+          </li>
+          <li>
+            Step 2 re-runs the same check, also passes → auto-advances again. The search lead-in
+            silently evaporates and the user lands on step 3.
+          </li>
+        </ol>
+
+        <h3 id="flow-offtrack">8.4 &nbsp;Wrong page → "Take me back"</h3>
+        <ol class="step-chain">
+          <li>
+            On step 5 ("Choose PostgreSQL", <code>urlPattern:'/sql/choose-instance'</code>) the user
+            clicks MySQL and lands on a MySQL form.
+          </li>
+          <li>
+            <b><span class="pill p-bridge">bridge</span></b> <code>onGcpUrlChanged</code> fires
+            (it's the pinned tab) with the new URL.
+          </li>
+          <li>
+            <b><span class="pill p-react">ui</span></b> <code>stepCompletedByUrl</code> is false
+            (MySQL form ≠ <code>engine=PostgreSQL</code>) and <code>isOnStepPage</code> is false →
+            <code>setOffTrack(true)</code>, <code>setStatusMessage(OFF_TRACK_MESSAGE)</code>,
+            <code>showLostMascot()</code>.
+          </li>
+          <li>
+            <b><span class="pill p-content">page</span></b> <code>showLost()</code> draws Baymax at
+            the edge with a "← Take me back" button (top frame only).
+          </li>
+          <li>
+            User clicks it → <code>BAYMAX_GUIDE_GO_BACK</code> → <code>onGoBack</code> →
+            <code>handleTakeMeBack</code> → <code>goToStepPage(step)</code>:
+            <code>chrome.tabs.goBack</code>, wait 500ms, verify the landed URL — hard-navigate to
+            <code>step.url</code> if still wrong — then re-highlight after 1.5s.
+          </li>
+        </ol>
+
+        <h3 id="flow-doitforme">8.5 &nbsp;"Do it for me"</h3>
+        <ol class="step-chain">
+          <li>
+            <b><span class="pill p-react">ui</span></b> <code>handleDoItForMe</code> →
+            <code>runStepAction(step)</code>.
+          </li>
+          <li>
+            <b><span class="pill p-bridge">bridge</span></b> <code>runStepAction</code> sends
+            <code>{action: step.action==='fill' ? 'fill' : 'click', …, value}</code>.
+          </li>
+          <li>
+            <b><span class="pill p-content">page</span></b> <code>click()</code>/<code>fill()</code>
+            resolves + highlights, <b>un-watches</b> (so it doesn't report its own synthetic
+            action), then programmatically clicks/fills.
+          </li>
+          <li>
+            <b><span class="pill p-react">ui</span></b> Because the overlay stayed silent,
+            <code>index.jsx</code> advances itself: submit steps call <code>verifySubmit()</code>;
+            everything else <code>setTimeout(…, 800)</code> — which fires only if
+            <code>stepIndexRef</code> still equals the index the button was pressed on (a navigating
+            click may have advanced the guide already).
+          </li>
+        </ol>
+
+        <h3 id="flow-reposition">8.6 &nbsp;The highlight healing itself (no round-trip)</h3>
+        <p>
+          This one lives entirely inside <code>guide-overlay.js</code>. On the create form, entering
+          a duplicate instance ID makes Angular re-render the field. The old node the outline was
+          glued to is detached. The rAF <code>startReposition</code> loop notices
+          <code>!el.isConnected</code>, re-runs <code>resolveTarget(currentIntent)</code>, finds the
+          fresh field, and <code>reanchorHighlight</code>s onto it — outline, mascot, and watchers
+          all follow, with no message to the panel and no user action.
+        </p>
+
+        <h3 id="flow-record">8.7 &nbsp;Recording a guide</h3>
+        <ol class="step-chain">
+          <li>
+            <b><span class="pill p-bridge">bridge</span></b> <code>startRecording()</code> →
+            <code>resetGuidedTab()</code> (adopt the tab the user is on now) →
+            <code>{action:'record-start'}</code>.
+          </li>
+          <li>
+            <b><span class="pill p-content">page</span></b> attaches capture-phase click/input
+            listeners. Each user action → <code>fingerprintElement</code> →
+            <code>BAYMAX_RECORD_ACTION</code>.
+          </li>
+          <li>
+            <b><span class="pill p-bridge">bridge</span></b>
+            <code>onRecordedAction(cb)</code> streams each to the UI, which builds a draft
+            (collapsing click-then-type into one fill step, dropping exact repeats).
+          </li>
+          <li>
+            On save, <code>recordedActionToStep</code> converts each fingerprint into a step (values
+            → placeholders), and <code>applyGeneric</code>/<code>volatileTokensFromUrl</code>
+            optionally strip instance-specific ids so it replays anywhere. The result is a guide
+            object shaped exactly like the bundled guides — which <code>index.jsx</code> then drives
+            identically.
+          </li>
+        </ol>
+
+        <!-- ============================================================ -->
+        <h2 class="sec" id="patterns">9 &nbsp;Design patterns worth internalising</h2>
+        <table>
+          <tr>
+            <th>Pattern</th>
+            <th>Where</th>
+            <th>Why it exists</th>
+          </tr>
+          <tr>
+            <td><b>Intent over selectors</b></td>
+            <td>resolver in overlay</td>
+            <td>
+              GCP's DOM is a moving target; role + accessible name survive redesigns that break CSS
+              selectors.
+            </td>
+          </tr>
+          <tr>
+            <td><b>Scoring, not matching</b></td>
+            <td><code>scoreCandidate</code></td>
+            <td>
+              Multiple elements can plausibly match; scoring + a threshold picks the best visible
+              one and rejects look-alikes.
+            </td>
+          </tr>
+          <tr>
+            <td><b>The frontier rule</b></td>
+            <td><code>maxReachedRef</code></td>
+            <td>
+              Stops URL-based auto-skip from cascading the user forward when they deliberately press
+              Back.
+            </td>
+          </tr>
+          <tr>
+            <td><b>One progress source</b> <span class="pill p-new">new</span></td>
+            <td><code>markStepStatus</code></td>
+            <td>
+              The backend step status is the only store; a second (localStorage) source made fresh
+              runs inherit abandoned progress.
+            </td>
+          </tr>
+          <tr>
+            <td><b>Pinned tab identity</b> <span class="pill p-new">new</span></td>
+            <td><code>guidedTabId</code></td>
+            <td>
+              The guide follows one tab by id, not whichever GCP tab has focus — no hijacked
+              highlights or phantom off-track.
+            </td>
+          </tr>
+          <tr>
+            <td><b>Local steps authoritative</b> <span class="pill p-new">new</span></td>
+            <td>load effect</td>
+            <td>
+              The backend's step copy is lossy (drops resolver fields); it may resume a run but
+              never replace live steps.
+            </td>
+          </tr>
+          <tr>
+            <td><b>Report key = selector‖name</b></td>
+            <td>overlay ↔ index.jsx</td>
+            <td>
+              A single agreed string lets "the user clicked X" map cleanly to "step X is done", even
+              for generalised steps.
+            </td>
+          </tr>
+          <tr>
+            <td><b>Un-watch before acting</b></td>
+            <td><code>click</code>/<code>fill</code></td>
+            <td>
+              Prevents a synthetic action from also firing the user-action event and
+              double-advancing.
+            </td>
+          </tr>
+          <tr>
+            <td><b>Navigation = proof</b></td>
+            <td><code>awaitNavigation</code></td>
+            <td>A click on a submit button isn't success; only landing on the next page is.</td>
+          </tr>
+          <tr>
+            <td><b>Shadow DOM isolation</b></td>
+            <td><code>ensureRoot</code></td>
+            <td>The console can't restyle Baymax and Baymax can't leak styles into the console.</td>
+          </tr>
+          <tr>
+            <td><b>Broadcast to all frames</b></td>
+            <td><code>sendGuideCommand</code></td>
+            <td>The real target often lives in a same-origin iframe, not frame 0.</td>
+          </tr>
+          <tr>
+            <td><b>Graceful degradation</b></td>
+            <td>everywhere</td>
+            <td>
+              Every path fails to a readable status message, never a crash — the guide is a helper,
+              not a blocker.
+            </td>
+          </tr>
+        </table>
+
+        <div class="key" style="margin-top: 26px">
+          <b>The whole system in one loop:</b><br />
+          <code>index.jsx</code> picks a <code>step</code> (from a bundled, recorded, official, or
+          AI guide) → <code>guide.js</code> messages it to the <b>pinned</b> tab →
+          <code>guide-overlay.js</code> resolves + highlights it and watches the user → the user
+          acts → <code>guide-overlay.js</code> reports it back → <code>guide.js</code> relays the
+          event → <code>index.jsx</code> advances <code>stepIndex</code> and persists the status to
+          the backend → the loop repeats until the last step calls <code>finish()</code>.
+        </div>
+
+        <p class="mini" style="margin-top: 40px">
+          v2 — regenerated 2026-07-09 against the current code. Source files:
+          <code>src/lib/guides/cloudSqlPostgres.js</code>, <code>src/lib/guides/cloudRun.js</code>,
+          <code>src/pages/Guidance/index.jsx</code>, <code>src/lib/guide.js</code>,
+          <code>public/guide-overlay.js</code>. The previous version is kept as
+          <code>guide-automation-explained.html</code>.
+        </p>
+      </main>
+    </div>
+  </body>
+</html>

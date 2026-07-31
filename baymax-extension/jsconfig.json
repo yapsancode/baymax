@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    // baseUrl removed — deprecated in TS 6.0, removed in 7.0.
+    // paths now include the "./src" prefix directly, so the "@/" alias still works.
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}

@@ -1,0 +1,21 @@
+# Keep the build context (and image) small and secret-free.
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Secrets — never bake .env into the image. Cloud Run injects env vars at runtime;
+# for local runs pass them with: docker run --env-file .env ...
+.env
+.env.*
+
+# Docs / editor / vcs — not needed in the runtime image.
+*.md
+.vscode/
+.idea/
+.git/
+.gitignore
+.dockerignore
+Dockerfile

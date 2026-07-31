@@ -1,0 +1,588 @@
+[
+  {
+    "id": "gcp-create-cloud-sql-postgres-instance",
+    "title": "Create a Cloud SQL PostgreSQL Instance",
+    "keywords": ["cloud sql", "cloudsql", "postgres", "postgresql", "sql instance", "database instance"],
+    "search_description": "Create a managed database instance using Cloud SQL. Set up, provision, or launch a PostgreSQL relational database on Google Cloud Console. Keywords: sql, postgres, postgresql, database, relational db, db instance, cloudsql.",
+    "steps": [
+      {
+        "id": 1,
+        "title": "Search for Cloud SQL",
+        "description": "Search for the Cloud SQL service from the console header search bar.",
+        "action": "fill",
+        "role": "textbox",
+        "name": "Search bar",
+        "selector": "input#mat-input-0",
+        "value": "cloudsql",
+        "url": "https://console.cloud.google.com/welcome"
+      },
+      {
+        "id": 2,
+        "title": "Select Cloud SQL",
+        "description": "Click 'Cloud SQL' in the search results to route to the SQL dashboard.",
+        "action": "click",
+        "role": "link",
+        "name": "Cloud SQL",
+        "selector": "div#SQL_SECTION > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+        "advanceOnUrlPattern": "/sql/instances(?:[/;?#]|$)"
+      },
+      {
+        "id": 3,
+        "title": "Click Create Instance",
+        "description": "Click the 'Create instance' button on the landing dashboard.",
+        "action": "click",
+        "role": "link",
+        "name": "Create instance",
+        "selector": "div:nth-of-type(1) > ng-component:nth-of-type(1) > sql-zero-state:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)",
+        "urlPattern": "/sql/instances(?:[/;?#]|$)",
+        "advanceOnUrlPattern": "/sql/choose-instance-engine(?:[/;?#]|$)"
+      },
+      {
+        "id": 4,
+        "title": "Choose PostgreSQL Engine",
+        "description": "Select the PostgreSQL card to start configuring the database.",
+        "action": "click",
+        "role": "button",
+        "name": "Choose PostgreSQL",
+        "selector": "cfc-info-card-item:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > a:nth-of-type(1)",
+        "urlPattern": "/sql/choose-instance-engine(?:[/;?#]|$)",
+        "advanceOnUrlPattern": "/sql/instances/create(?:[/;?#]|$)"
+      },
+      {
+        "id": 5,
+        "title": "Enable API",
+        "description": "Click the API enablement wrapper to proceed if prompted.",
+        "action": "click",
+        "role": "button",
+        "name": "Enable",
+        "selector": "cfc-virtual-viewport:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > apis-enabler:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1)",
+        "urlPattern": "/sql/instances/create(?:[/;?#]|$)"
+      },
+      {
+        "id": 6,
+        "title": "Provide Instance ID",
+        "description": "Enter the designated naming identifier for the instance.",
+        "action": "fill",
+        "role": "textbox",
+        "name": "Instance ID",
+        "selector": "input#_3rif_mat-input-2",
+        "value": "",
+        "isParameter": true,
+        "urlPattern": "/sql/instances/create(?:[/;?#]|$)"
+      },
+      {
+        "id": 7,
+        "title": "Provide Password",
+        "description": "Set the root administrative password for the cluster.",
+        "action": "click",
+        "role": "textbox",
+        "name": "Password",
+        "selector": "input#_3rif_mat-input-3",
+        "value": "",
+        "isParameter": true,
+        "urlPattern": "/sql/instances/create(?:[/;?#]|$)"
+      },
+      {
+        "id": 8,
+        "title": "Choose a region",
+        "description": "Pick the region closest to you, for example asia-southeast1.",
+        "action": "highlight",
+        "role": "combobox",
+        "name": "Region",
+        "selector": "mat-select[formcontrolname=\"region\"], mat-select[name=\"region\"], [data-test-id=\"region-select\"]",
+        "urlPattern": "engine=PostgreSQL"
+      },
+      {
+        "id": 9,
+        "title": "Choose the Enterprise edition",
+        "description": "Pick the standard Enterprise edition layout configuration.",
+        "action": "click",
+        "name": "Enterprise",
+        "role": "radio",
+        "avoidText": "plus",
+        "selector": "mat-radio-button, [role=\"radio\"], input[type=\"radio\"]",
+        "urlPattern": "engine=PostgreSQL"
+      },
+      {
+        "id": 10,
+        "title": "Finalize Creation",
+        "description": "Click the submit button to launch the production cloud sql deployment sequence.",
+        "action": "click",
+        "role": "button",
+        "name": "Create instance",
+        "selector": "button#_3rif_sql-create-instance-button",
+        "urlPattern": "/sql/instances/create(?:[/;?#]|$)"
+      }
+    ]
+  },
+  {
+    "id": "gcp-create-cloud-storage-bucket",
+    "title": "Create a Cloud Storage Bucket",
+    "keywords": ["cloud storage", "storage bucket", "gcs", "gcp storage", "bucket"],
+    "search_description": "Create a simple file storage bucket in Google Cloud Storage. Upload binary objects, set region localization, configure default standard storage classes, and adjust IAM controls. Keywords: cloud storage, bucket, gcs, store files, binary storage, object store.",
+    "steps": [
+      {
+        "id": 1,
+        "title": "Search for Cloud Storage",
+        "description": "Search for cloud storage in the main GCP console window.",
+        "action": "fill",
+        "role": "textbox",
+        "name": "Search input",
+        "selector": "input#mat-input-0",
+        "value": "storage",
+        "url": "https://console.cloud.google.com/welcome"
+      },
+      {
+        "id": 2,
+        "title": "Select Cloud Storage",
+        "description": "Click the 'Cloud Storage' module route.",
+        "action": "click",
+        "role": "link",
+        "name": "Cloud Storage",
+        "selector": "div#STORAGE_SECTION > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+        "advanceOnUrlPattern": "/storage/overview(?:[/;?#]|$)"
+      },
+      {
+        "id": 3,
+        "title": "Click Create Bucket",
+        "description": "Click the 'Create bucket' navigation button inside the landing dashboard view.",
+        "action": "click",
+        "role": "link",
+        "name": "Create bucket",
+        "selector": "span:nth-of-type(1) > storage-landing-overview:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+        "urlPattern": "/storage/overview(?:[/;?#]|$)",
+        "advanceOnUrlPattern": "/storage/[^/;?#]+(?:[/;?#]|$)"
+      },
+      {
+        "id": 4,
+        "title": "Name the Bucket",
+        "description": "Provide a globally unique system identifier label configuration string value.",
+        "action": "fill",
+        "role": "textbox",
+        "name": "Name your bucket",
+        "selector": "[formcontrolname=\"name\"], input#_7rif_bucket-name-input",
+        "value": "",
+        "isParameter": true,
+        "urlPattern": "/storage/[^/;?#]+(?:[/;?#]|$)"
+      },
+      {
+        "id": 5,
+        "title": "Continue Past Naming Step",
+        "description": "Proceed to the geographic distribution zone setup settings wizard component configuration step panel.",
+        "action": "click",
+        "role": "button",
+        "name": "Continue",
+        "selector": "div#_7rif_cfc-stepper-step-content-and-continue-5 > div:nth-of-type(2) > button:nth-of-type(1)",
+        "urlPattern": "/storage/[^/;?#]+(?:[/;?#]|$)"
+      },
+      {
+        "id": 6,
+        "title": "Open Location Dropdown",
+        "description": "Open options selection framework menu lists.",
+        "action": "click",
+        "name": "Location list",
+        "selector": "span#_7rif_new-location-select-select-value",
+        "urlPattern": "/storage/[^/;?#]+(?:[/;?#]|$)"
+      },
+      {
+        "id": 7,
+        "title": "Select Asia Region Category",
+        "description": "Toggle the multi-regional target specification focus.",
+        "action": "click",
+        "role": "option",
+        "name": "asia  (multiple regions in Asia)",
+        "selector": "mat-option#_7rif_mat-option-25",
+        "urlPattern": "/storage/[^/;?#]+(?:[/;?#]|$)"
+      },
+      {
+        "id": 8,
+        "title": "Continue to Class Settings",
+        "description": "Commit spatial parameters details updates data inputs.",
+        "action": "click",
+        "role": "button",
+        "name": "Continue",
+        "selector": "div#_7rif_cfc-stepper-step-content-and-continue-9 > div:nth-of-type(2) > button:nth-of-type(1)",
+        "urlPattern": "/storage/[^/;?#]+(?:[/;?#]|$)"
+      },
+      {
+        "id": 9,
+        "title": "Select Default Storage Class Configuration Mode",
+        "description": "Initialize storage architecture options tracking logic arrays.",
+        "action": "click",
+        "role": "radio",
+        "name": "Set a default class",
+        "selector": "[name=\"mat-radio-group-6\"], input#_7rif_mat-radio-18-input",
+        "urlPattern": "/storage/[^/;?#]+(?:[/;?#]|$)"
+      },
+      {
+        "id": 10,
+        "title": "Select Standard Performance Pricing Model Option",
+        "description": "Choose Standard class configurations settings framework node indices targets.",
+        "action": "click",
+        "role": "radio",
+        "name": "Standard",
+        "selector": "[name=\"mat-radio-group-7\"], input#_7rif_mat-radio-19-input",
+        "urlPattern": "/storage/[^/;?#]+(?:[/;?#]|$)"
+      },
+      {
+        "id": 11,
+        "title": "Continue to Access Controls Layout",
+        "description": "Save class structural decisions state indicators values flags properties.",
+        "action": "click",
+        "role": "button",
+        "name": "Continue",
+        "selector": "div#_7rif_cfc-stepper-step-content-and-continue-6 > div:nth-of-type(2) > button:nth-of-type(1)",
+        "urlPattern": "/storage/[^/;?#]+(?:[/;?#]|$)"
+      },
+      {
+        "id": 12,
+        "title": "Enforce Uniform IAM Security Rules Enforcement Scheme",
+        "description": "Confirm uniform level IAM tracking metrics configuration constraints parameters inputs rules.",
+        "action": "click",
+        "role": "radio",
+        "name": "Uniform",
+        "selector": "[name=\"mat-radio-group-8\"], input#_7rif_mat-radio-23-input",
+        "urlPattern": "/storage/[^/;?#]+(?:[/;?#]|$)"
+      },
+      {
+        "id": 13,
+        "title": "Finalize Bucket Creation Phase Sequence Process",
+        "description": "Trigger final compilation execution orchestration lifecycle commands parameters triggers targets engines runtime layers.",
+        "action": "click",
+        "role": "button",
+        "name": "Continue / Create",
+        "selector": "div#_7rif_cfc-stepper-step-content-and-continue-7 > div:nth-of-type(2) > button:nth-of-type(1)",
+        "urlPattern": "/storage/[^/;?#]+(?:[/;?#]|$)"
+      }
+    ]
+  },
+  {
+    "id": "gcp-create-compute-engine-vm-instance",
+    "title": "Create a Compute Engine VM Instance",
+    "keywords": ["compute engine", "vm", "virtual machine", "gce", "compute instance", "linux instance"],
+    "search_description": "Spin up, provision, create, or configure a virtual machine (VM) compute instance inside Compute Engine (GCE). Select sizes like e2-medium, machine families, specify hosting zones like asia-southeast1-a, and name servers. Keywords: compute engine, vm, virtual machine, gce, spin up linux instance, server infrastructure.",
+    "steps": [
+      {
+        "id": 1,
+        "title": "Search for Compute Engine",
+        "description": "Enter search criteria to find core computing infrastructure dashboard.",
+        "action": "fill",
+        "role": "textbox",
+        "name": "Search",
+        "selector": "input#mat-input-0",
+        "value": "compute",
+        "url": "https://console.cloud.google.com/welcome"
+      },
+      {
+        "id": 2,
+        "title": "Select Compute Engine Component",
+        "description": "Click the engine tracking option selection inside navigation components wrappers panels nodes.",
+        "action": "click",
+        "role": "link",
+        "name": "Compute Engine",
+        "selector": "div#COMPUTE_SECTION > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+        "advanceOnUrlPattern": "/compute/overview(?:[/;?#]|$)"
+      },
+      {
+        "id": 3,
+        "title": "Click Create Instance Button Setup",
+        "description": "Initiate adding brand new hardware computational cluster configuration profiles tracking records records database layers infrastructure modules nodes engines runtime profiles schemas metadata sets pipelines workflows models controllers.",
+        "action": "click",
+        "role": "link",
+        "name": "Create instance",
+        "selector": "a#_4rif_create",
+        "urlPattern": "/compute/overview(?:[/;?#]|$)",
+        "advanceOnUrlPattern": "/compute/instancesAdd(?:[/;?#]|$)"
+      },
+      {
+        "id": 4,
+        "title": "Provide Custom Server Hostname Profile Title Label Identifier Input Text Field Value Target String Parameter",
+        "description": "Set the target VM node tag string metadata identification parameters indices sets trackers properties values dynamically fields.",
+        "action": "fill",
+        "role": "textbox",
+        "name": "Name",
+        "selector": "input#_4rif_mat-input-3",
+        "value": "",
+        "isParameter": true,
+        "urlPattern": "/compute/instancesAdd(?:[/;?#]|$)"
+      },
+      {
+        "id": 5,
+        "title": "Open Regional Geographical Deployment Selector Input Toggle Combobox Window Elements Popups Trees Lists Wrappers Properties Fields",
+        "description": "Open default geography configuration targets option frameworks maps layout trees hierarchies indices profiles tags indicators controls elements list components nodes tracks dashboards sets.",
+        "action": "click",
+        "name": "Region box wrapper menu dropdown control parameter click step action node list array item tracker target instance value indicator",
+        "selector": "div:nth-of-type(1) > net-region-input:nth-of-type(1) > mat-form-field:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+        "urlPattern": "/compute/instancesAdd(?:[/;?#]|$)"
+      },
+      {
+        "id": 6,
+        "title": "Select Singapore Southeast Asia Hosting Data Center Node Cluster Profile Target Configuration Layer Core Processing Environment",
+        "description": "Pick regional structural localization options boundaries zones configurations layouts specifications.",
+        "action": "click",
+        "role": "option",
+        "name": "asia-southeast1  (Singapore)",
+        "selector": "mat-option#_4rif_mat-option-54",
+        "urlPattern": "/compute/instancesAdd(?:[/;?#]|$)"
+      },
+      {
+        "id": 7,
+        "title": "Open Zone Option Dropdown Lists Menus Combobox Fields Elements UI Triggers Layout Frameworks Tracking Properties Panels Trees",
+        "description": "Click the zone picker tracking layout logic configuration array object indices parameters targets fields wrapper values components list nodes.",
+        "action": "click",
+        "name": "Zone selector drop list",
+        "selector": "cfc-select#_4rif_cfc-select-3 > div:nth-of-type(1) > div:nth-of-type(1)",
+        "urlPattern": "/compute/instancesAdd(?:[/;?#]|$)"
+      },
+      {
+        "id": 8,
+        "title": "Select Specific Availability Subzone Data Center Rack Target Node Localization Partition Section Division Segment Unit Profile A",
+        "description": "Toggle structural data center sub-layout segment identifiers metrics constraints settings profiles logic models indices mapping schemas tracking layers.",
+        "action": "click",
+        "role": "option",
+        "name": "asia-southeast1-a",
+        "selector": "mat-option#_4rif_mat-option-154",
+        "urlPattern": "/compute/instancesAdd(?:[/;?#]|$)"
+      },
+      {
+        "id": 9,
+        "title": "Choose Cost Efficient E2 Series Generational Microprocessor Architecture Family Class Category Segment Selection Radio Element",
+        "description": "Configure compute virtual hardware grouping classifications profiles bounds specs details configurations structures options metrics indexes systems schemas algorithms mapping blueprints designs definitions frameworks.",
+        "action": "click",
+        "role": "radio",
+        "name": "E2",
+        "selector": "[name=\"cfc-table-caption-5\"], input#_4rif_mat-radio-54-input",
+        "urlPattern": "/compute/instancesAdd(?:[/;?#]|$)"
+      },
+      {
+        "id": 10,
+        "title": "Open Sizing Allocation Combobox Layout Tree Table Menu Panel Field View Modal Interface Trigger Element Input Dynamic List Component Node Component Layer",
+        "description": "Open full server machine footprint sizing metrics classification models arrays components nodes dropdown maps architectures.",
+        "action": "click",
+        "role": "button",
+        "name": "Machine type e2-medium (2 vCPU, 1 core, 4 GB memory)",
+        "selector": "[formcontrolname=\"formValue\"], cfc-select-dual-column#_4rif_cfc-select-dual-column-0",
+        "urlPattern": "/compute/instancesAdd(?:[/;?#]|$)"
+      },
+      {
+        "id": 11,
+        "title": "Toggle Low Cost Shared Compute Core Distribution Strategy Class Level Options Bounds Track Configurations Standard Modes Values Tags Properties Properties Indicators Profiles",
+        "description": "Select shared resource allocation optimization algorithms logic tiers parameters sets tracking layers schemas indices structures properties constraints definitions fields parameters metadata records metrics targets rules parameters frameworks values nodes.",
+        "action": "click",
+        "role": "option",
+        "name": "Shared-core",
+        "selector": "mat-option#_4rif_mat-option-93",
+        "urlPattern": "/compute/instancesAdd(?:[/;?#]|$)"
+      },
+      {
+        "id": 12,
+        "title": "Commit Medium Variant Performance Blueprint Metric Footprint Spec Selection Target Click Step Operation Event Core Action Instance Node Option Parameter Block Profile",
+        "description": "Select the exact e2-medium target sizing matrix profiles structures metadata specifications items options parameters properties indices configurations.",
+        "action": "click",
+        "role": "option",
+        "name": "e2-medium e2-medium (2 vCPU, 1 core, 4 GB memory)1-2 vCPU (1 shared core), 4 GB memory",
+        "selector": "mat-option#_4rif_mat-option-129",
+        "urlPattern": "/compute/instancesAdd(?:[/;?#]|$)"
+      }
+    ]
+  },
+  {
+    "id": "gcp-create-service-account-and-generate-key",
+    "title": "Create a Service Account and Generate a JSON Key",
+    "keywords": ["service account", "iam", "json key", "credentials", "service account key"],
+    "search_description": "Create a secure service account under IAM & Admin. Set credentials, choose standard programmatic access authorization constraints, configure roles such as Project Owner or Editor, and download security authentication json secret key files to allow applications to connect safely. Keywords: service account, iam credentials, json key file, api access token, service accounts permission configuration pipeline.",
+    "steps": [
+      {
+        "id": 1,
+        "title": "Go to IAM & Admin",
+        "description": "Click the IAM control panel reference link node matrix dashboard item tracker entry.",
+        "action": "click",
+        "role": "link",
+        "name": "IAM & Admin",
+        "selector": "div:nth-of-type(1) > lp-quick-access:nth-of-type(1) > div:nth-of-type(1) > lp-quick-access-cards:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(2)",
+        "advanceOnUrlPattern": "/[^/;?#]+/iam(?:[/;?#]|$)"
+      },
+      {
+        "id": 2,
+        "title": "Navigate to Service Accounts Menu Section Option Subview Navigation Component Tree List Entry Control Point Link Target Layer Element Row Block",
+        "description": "Route directly down into programmatic authentication entity ledger layout indexes mapping tables tracking layers database modules structures records catalogs.",
+        "action": "click",
+        "role": "link",
+        "name": "Service Accounts, 2 of 9",
+        "selector": "a#cfctest-section-nav-item-IAM_ADMIN_SECTION_serviceaccounts",
+        "urlPattern": "/[^/;?#]+/iam(?:[/;?#]|$)",
+        "advanceOnUrlPattern": "/[^/;?#]+/serviceaccounts(?:[/;?#]|$)"
+      },
+      {
+        "id": 3,
+        "title": "Trigger Administrative Creation Pipeline Sequence Wizard Launch Action Toolbar Button Element Header Controls Wrapper Component Layer Element Block",
+        "description": "Initiate structural deployment onboarding orchestration protocols commands scripts parameters.",
+        "action": "click",
+        "role": "button",
+        "name": "Create service account",
+        "selector": "button#_2rif_toolbar-element-BgdXRYYY",
+        "urlPattern": "/[^/;?#]+/serviceaccounts(?:[/;?#]|$)",
+        "advanceOnUrlPattern": "/[^/;?#]+/serviceaccounts/create(?:[/;?#]|$)"
+      },
+      {
+        "id": 4,
+        "title": "Focus Data Form Fields Wrapper Frame Matrix Node Block Layout Structure Panel Component Details Target View Elements Grid Section Section Segment Layer",
+        "description": "Ensure text insertion targets structural readiness index boundaries configurations settings context alignment logic paths maps models layout blocks dashboards targets layers tracking nodes models variables definitions tracking properties indices logic definitions.",
+        "action": "click",
+        "selector": "service-account-name-and-id:nth-of-type(1) > div:nth-of-type(1) > mat-form-field:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2)",
+        "urlPattern": "/[^/;?#]+/serviceaccounts/create(?:[/;?#]|$)"
+      },
+      {
+        "id": 5,
+        "title": "Provide Identity Display Name Profile Title Tag Value String Parameter Field Form Input Box Object Control Node Component Matrix",
+        "description": "Input specific authorization target identification context labels metadata markers descriptors elements dynamic variables identifiers constraints specifications.",
+        "action": "fill",
+        "role": "textbox",
+        "name": "Service account name",
+        "selector": "[formcontrolname=\"displayName\"], input#_2rif_mat-input-0",
+        "value": "",
+        "isParameter": true,
+        "urlPattern": "/[^/;?#]+/serviceaccounts/create(?:[/;?#]|$)"
+      },
+      {
+        "id": 6,
+        "title": "Proceed to Role Assignment Step Interface Frame Wizard Controller Button Progress Logic Actions Component Nodes Navigation Panel Node Panel Block",
+        "description": "Save basic core structural profile values variables settings metrics criteria attributes parameters elements options tracking indicators mappings architectures patterns layout controls.",
+        "action": "click",
+        "role": "button",
+        "name": "Create and continue",
+        "selector": "div#_2rif_cfc-stepper-step-content-and-continue-0 > div:nth-of-type(2) > button:nth-of-type(1)",
+        "urlPattern": "/[^/;?#]+/serviceaccounts/create(?:[/;?#]|$)"
+      },
+      {
+        "id": 7,
+        "title": "Open IAM Authorization Permissions Matrix Dropdown Menu List Grid Structural Object Trigger Action Selector Field Input Combobox Node Layer Component Block",
+        "description": "Reveal role mapping indices frameworks configurations layouts tracking data catalogs profiles models hierarchies blueprints structures metrics variables options fields metadata.",
+        "action": "click",
+        "selector": "cfc-select-dual-column#_2rif_cfc-select-dual-column-0 > div:nth-of-type(1) > cm-icon:nth-of-type(1) > svg:nth-of-type(1) > path:nth-of-type(1)",
+        "urlPattern": "/[^/;?#]+/serviceaccounts/create(?:[/;?#]|$)"
+      },
+      {
+        "id": 8,
+        "title": "Select Full Owner High Privilege Level Privilege Classification Hierarchy Target Option Item Entry Row Selection Node Click Operation Block Profile",
+        "description": "Grant full resource controller access levels flags permissions variables states settings keys values rules bounds structures frameworks definitions layouts mappings parameters indices.",
+        "action": "click",
+        "role": "option",
+        "name": "Owner",
+        "selector": "mat-option#_2rif_mat-option-168",
+        "urlPattern": "/[^/;?#]+/serviceaccounts/create(?:[/;?#]|$)"
+      },
+      {
+        "id": 9,
+        "title": "Commit Settings Progression Step Navigation Flow Control Dynamic Button Element Module Actions Core Wrapper Segment Row Structural Node Context Layer View",
+        "description": "Confirm permission tracking bounds parameter definitions context schemas tracking structures models indices mappings patterns structural boundaries metrics options variables rules properties.",
+        "action": "click",
+        "role": "button",
+        "name": "Continue",
+        "selector": "div#_2rif_cfc-stepper-step-content-and-continue-1 > div:nth-of-type(2) > button:nth-of-type(1)",
+        "urlPattern": "/[^/;?#]+/serviceaccounts/create(?:[/;?#]|$)"
+      },
+      {
+        "id": 10,
+        "title": "Complete Entity Creation Pipeline Sequence Final Process Termination Workflow Step Action Executable Submit Component Button Interface Module Grid Frame",
+        "description": "Save full configured configuration profile state fields variables entities properties configurations logic paths tracking elements structures bounds models frameworks metrics metadata sets definitions parameters algorithms schemas blueprints indexes layouts rules tracking options maps catalogs arrays contexts.",
+        "action": "click",
+        "role": "button",
+        "name": "Done",
+        "selector": "cfc-stepper#_2rif_cfctest-demo-noogler-stepper > div:nth-of-type(1) > div:nth-of-type(1) > cfc-progress-button:nth-of-type(1) > div:nth-of-type(1) > button:nth-of-type(1)",
+        "urlPattern": "/[^/;?#]+/serviceaccounts/create(?:[/;?#]|$)"
+      }
+    ]
+  },
+  {
+    "id": "gcp-deploy-cloud-run-container-service",
+    "title": "Deploy a Cloud Run Container Service",
+    "keywords": ["cloud run", "cloudrun", "serverless", "container deploy", "cloud run deploy", "deploy container"],
+    "search_description": "Deploy a stateless, microservices container app or API service on Google Cloud Run. Select demo test sample containers, name web services, configure location data center parameters like asia-southeast1 (Singapore), and toggle allow unauthenticated public web traffic access. Keywords: cloud run, serverless, deploy docker container, container image web server api app, cloudrun module launch server pipeline infrastructure.",
+    "steps": [
+      {
+        "id": 1,
+        "title": "Search for Cloud Run Module Options",
+        "description": "Input primary target application routing criteria terms string keys data profiles maps modules index parameters sets elements dashboards fields controllers properties fields contexts definitions catalog mappings.",
+        "action": "fill",
+        "role": "textbox",
+        "name": "Search navigation wrapper control layer panel block framework row block dynamic target field box element query entry trigger text tracker",
+        "selector": "input#mat-input-0",
+        "value": "cloudrun",
+        "url": "https://console.cloud.google.com/welcome"
+      },
+      {
+        "id": 2,
+        "title": "Select Serverless Cloud Run Component Profile Link Navigation Target Section Click Activity Row Item Node Component View Matrix Layout Panel Structure",
+        "description": "Route directly to serverless management overview matrices lists grids structural framework tracking nodes options catalog metadata structures records data sets parameters bounds models schemas blueprints definitions models maps hierarchies properties context indices layouts logic controllers tracks blueprints tracking metrics fields mapping configurations algorithms rules parameters structures contexts layers.",
+        "action": "click",
+        "role": "link",
+        "name": "Cloud Run",
+        "selector": "div#SERVERLESS_SECTION > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)",
+        "advanceOnUrlPattern": "/run/overview(?:[/;?#]|$)"
+      },
+      {
+        "id": 3,
+        "title": "Click Deploy Container Trigger Button Framework Control Point Sub-Toolbar Navigation Action Element Selection Box Option Block Profile Row Structural Module View",
+        "description": "Launch brand new container virtualization deployment instance setup wizards settings orchestration workflows layout tracking layers properties parameters boundaries criteria variables indexes mappings data catalogs datasets items context.",
+        "action": "click",
+        "role": "link",
+        "name": "Deploy container",
+        "selector": "cm-grid-layout:nth-of-type(1) > tile-group:nth-of-type(1) > section:nth-of-type(1) > div:nth-of-type(2) > tile:nth-of-type(2) > a:nth-of-type(1)",
+        "urlPattern": "/run/overview(?:[/;?#]|$)",
+        "advanceOnUrlPattern": "/run/create(?:[/;?#]|$)"
+      },
+      {
+        "id": 4,
+        "title": "Select Sample Container Configuration Template Testing Demo Button Element Trigger Component Frame Interface Action View Context Block Profile Click Row Panel",
+        "description": "Populate initial image path values using default sandbox evaluation blueprints setups specifications metrics constraints.",
+        "action": "click",
+        "role": "button",
+        "name": "Test with a sample container",
+        "selector": "mat-hint#_4rif_mat-mdc-hint-113 > button:nth-of-type(1)",
+        "urlPattern": "/run/create(?:[/;?#]|$)"
+      },
+      {
+        "id": 5,
+        "title": "Provide Service Identification Name Variable Character Input Box Text String Field Interface Component Frame Matrix Controls Block Element Setup Context Profile",
+        "description": "Assign local domain endpoint reference matching label attributes context parameters dynamic variables fields tags properties bounds parameters metadata sets templates patterns tracking configurations.",
+        "action": "fill",
+        "role": "textbox",
+        "name": "Service name",
+        "selector": "input#_4rif_mat-input-40",
+        "value": "",
+        "isParameter": true,
+        "urlPattern": "/run/create(?:[/;?#]|$)"
+      },
+      {
+        "id": 6,
+        "title": "Open Regional Server Location Strategy Combobox Option List Framework Dropdown Trigger Interface Window Panel Layout Track Structural Node Component Elements Block View",
+        "description": "Expand multi-geography target selection list frameworks mapping systems blueprints configuration trees hierarchies parameters indices models metrics layouts rules parameters paths datasets tracking context components layer fields structures contexts tags tracking parameters profiles.",
+        "action": "click",
+        "name": "Location box wrapper list item picker drop down selection dynamic control menu node trigger array field variable target setting component frame view profile instance properties configuration parameter tracking",
+        "selector": "cfc-select#_4rif_cfc-select-14 > div:nth-of-type(1) > div:nth-of-type(1)",
+        "urlPattern": "/run/create(?:[/;?#]|$)"
+      },
+      {
+        "id": 7,
+        "title": "Select Singapore Data Center Zone Regional Operational Facility Infrastructure Section Option List Row Choice Action Click Target Component Element Block Profile Node",
+        "description": "Assign workload executions target spatial constraints metrics indicators zone structures templates mappings definitions tracking variables parameters datasets metadata items tracking boundaries properties criteria configurations patterns architectures framework models controllers paths fields rules contexts.",
+        "action": "click",
+        "role": "option",
+        "name": "asia-southeast1  (Singapore)  Tier 2 pricing; Ephemeral disk available; GPUs available",
+        "selector": "mat-option#_4rif_mat-option-671",
+        "urlPattern": "/run/create(?:[/;?#]|$)"
+      },
+      {
+        "id": 8,
+        "title": "Toggle Inbound Network Authorization Protocol Setting Radio Selector Button Interface Element Controls Wrapper Component Point Action Click Option Segment Profile Context Layer View",
+        "description": "Enable unauthenticated public web application interface endpoints routing connectivity metrics maps parameters values variables states criteria rules constraints mappings templates patterns configurations architectures models tracking context controllers indices options fields attributes descriptors.",
+        "action": "click",
+        "role": "radio",
+        "name": "Allow public access",
+        "selector": "[name=\"mat-radio-group-24\"], input#_4rif_mat-radio-57-input",
+        "urlPattern": "/run/create(?:[/;?#]|$)"
+      }
+    ]
+  }
+]
